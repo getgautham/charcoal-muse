@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import DiaryEntry from "@/components/DiaryEntry";
 import EntryList from "@/components/EntryList";
 import StreakTracker from "@/components/StreakTracker";
+import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { LogOut, BookOpen } from "lucide-react";
 import { Session } from "@supabase/supabase-js";
 
@@ -59,6 +60,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10">
+      <WelcomeDialog />
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
