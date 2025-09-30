@@ -1,19 +1,14 @@
 import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Entry } from "@/hooks/useEntries";
-import { Zap, TrendingUp, Heart } from "react-feather";
-import { MoodChart } from "./MoodChart";
-import { ActivityHeatmap } from "./ActivityHeatmap";
-import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { TrendingUp } from "react-feather";
 
 interface InsightsDashboardProps {
   entries: Entry[];
 }
 
 export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
-  const preferences = useUserPreferences();
-  const visualStyle = preferences.displayName ? localStorage.getItem('visualStyle') || 'balanced' : 'balanced';
   const insights = useMemo(() => {
     if (entries.length === 0) return null;
 
@@ -40,8 +35,8 @@ export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
     const themes = detectThemes(allContent);
 
     // Recent activity
-    const avgWordsPerEntry = recentEntries.length > 0
-      ? Math.round(recentEntries.reduce((sum, e) => sum + e.content.split(' ').length, 0) / recentEntries.length)
+    const avgWordsPerEntry = entries.length > 0
+      ? Math.round(entries.reduce((sum, e) => sum + e.content.split(' ').length, 0) / entries.length)
       : 0;
 
     return {
@@ -55,109 +50,67 @@ export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
   }, [entries]);
 
   if (!insights) {
-    return (
-      <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
-        <CardContent className="p-8 text-center">
-          <p className="text-muted-foreground text-sm">
-            Start writing to discover patterns about yourself
-          </p>
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
 
-  const showDetailed = visualStyle === 'detailed';
-  const showMinimal = visualStyle === 'minimal';
-
   return (
-    <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold flex items-center gap-2">
-          <Zap className="w-6 h-6 text-accent" />
-          Your Story So Far
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        {/* Mood Trend Chart */}
-        {!showMinimal && (
-          <div className="p-4 rounded-lg bg-background/50 border border-border/30">
-            <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" />
-              How you've been feeling
-            </h4>
-            <MoodChart entries={entries} visualStyle={visualStyle} />
-          </div>
-        )}
-
-        {/* Activity Heatmap - Only in detailed view */}
-        {showDetailed && entries.length >= 7 && (
-          <div className="p-4 rounded-lg bg-background/50 border border-border/30">
-            <h4 className="font-medium text-sm mb-3">Your writing rhythm</h4>
-            <ActivityHeatmap entries={entries} />
-          </div>
-        )}
-        {/* Mood Pattern */}
+    <Card className="p-4">
+      <h2 className="text-base font-semibold mb-3">Quick Insights</h2>
+      
+      <div className="grid grid-cols-2 gap-3">
+        {/* Dominant Mood */}
         {insights.dominantMood && (
-          <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
-            <div className="flex items-start gap-3">
-              <Heart className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h4 className="font-medium text-sm mb-1">Dominant vibe</h4>
-                <p className="text-sm text-muted-foreground">
-                  Lately you've been{' '}
-                  <Badge className="bg-accent/20 text-accent border-accent/30 mx-1">
-                    {insights.dominantMood}
+          <div className="p-3 rounded-lg bg-accent/10 border border-accent/30">
+            <p className="text-xs text-muted-foreground mb-1">Most Common</p>
+            <p className="text-sm font-semibold capitalize">{insights.dominantMood}</p>
+          </div>
+        )}
+        
+        {/* Entry Count */}
+        <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+          <p className="text-xs text-muted-foreground mb-1">Total Entries</p>
+          <p className="text-sm font-semibold">{insights.totalEntries}</p>
+        </div>
+
+        {/* Avg Words */}
+        <div className="p-3 rounded-lg bg-secondary/10 border border-secondary/30">
+          <p className="text-xs text-muted-foreground mb-1">Avg Words</p>
+          <p className="text-sm font-semibold">{Math.round(insights.avgWordsPerEntry)}</p>
+        </div>
+
+        {/* Recent Entries */}
+        <div className="p-3 rounded-lg bg-accent/10 border border-accent/30">
+          <p className="text-xs text-muted-foreground mb-1">This Week</p>
+          <p className="text-sm font-semibold">{insights.recentEntries}</p>
+        </div>
+      </div>
+
+      {/* Themes */}
+      {insights.themes.length > 0 && (
+        <div className="mt-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
+          <div className="flex items-start gap-2">
+            <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-xs text-muted-foreground mb-2">Your Themes</p>
+              <div className="flex flex-wrap gap-1.5">
+                {insights.themes.map((theme, i) => (
+                  <Badge key={i} variant="outline" className="text-xs bg-primary/5 border-primary/30">
+                    {theme}
                   </Badge>
-                  {!showMinimal && ' based on your recent writing'}
-                </p>
+                ))}
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Themes */}
-        {insights.themes.length > 0 && (
-          <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-            <div className="flex items-start gap-3">
-              <TrendingUp className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h4 className="font-medium text-sm mb-2">Top themes</h4>
-                <div className="flex flex-wrap gap-2">
-                  {insights.themes.map((theme, i) => (
-                    <Badge key={i} variant="outline" className="bg-primary/5 border-primary/30">
-                      {theme}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Activity Stats */}
-        {!showMinimal && (
-          <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 rounded-lg bg-background/50 border border-border/30">
-            <div className="text-2xl font-bold text-foreground">{insights.recentEntries}</div>
-            <div className="text-xs text-muted-foreground">entries this week</div>
-          </div>
-          <div className="p-3 rounded-lg bg-background/50 border border-border/30">
-            <div className="text-2xl font-bold text-foreground">{insights.avgWordsPerEntry}</div>
-            <div className="text-xs text-muted-foreground">avg words/entry</div>
           </div>
         </div>
-        )}
+      )}
 
-        {/* Latest Deep Insight */}
-        {insights.mostRecentInsight && !showMinimal && (
-          <div className="p-4 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-            <p className="text-xs text-muted-foreground mb-1">Most recent take</p>
-            <p className="text-sm text-foreground/90 italic leading-relaxed">
-              "{insights.mostRecentInsight}"
-            </p>
-          </div>
-        )}
-      </CardContent>
+      {/* Latest AI Insight - Mobile Optimized */}
+      {insights.mostRecentInsight && (
+        <div className="mt-3 p-3 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
+          <p className="text-xs text-muted-foreground mb-2">Latest Insight</p>
+          <p className="text-sm leading-relaxed">{insights.mostRecentInsight}</p>
+        </div>
+      )}
     </Card>
   );
 };
@@ -185,5 +138,5 @@ const detectThemes = (text: string): string[] => {
     }
   }
 
-  return themes.slice(0, 4);
+  return themes.slice(0, 3); // Only show 3 for mobile
 };

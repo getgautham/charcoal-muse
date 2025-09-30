@@ -8,8 +8,7 @@ import DiaryEntry from "@/components/DiaryEntry";
 import EntryList from "@/components/EntryList";
 import StreakTracker from "@/components/StreakTracker";
 import { InsightsDashboard } from "@/components/InsightsDashboard";
-import { MemoryIntelligence } from "@/components/MemoryIntelligence";
-import { EmotionBubbles } from "@/components/EmotionBubbles";
+import { EmotionalTimeline } from "@/components/EmotionalTimeline";
 import { GrowthInsights } from "@/components/GrowthInsights";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { LogOut, FileText } from "react-feather";
@@ -90,19 +89,20 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="space-y-6">
+        <div className="space-y-4 pb-6">
           <StreakTracker />
 
-          {/* Main Feature - Emotion Visualization */}
-          <EmotionBubbles entries={entries} />
+          {/* Main Feature - Interactive Timeline */}
+          <EmotionalTimeline entries={entries} />
 
-          {/* Growth Engine */}
+          {/* Growth Engine - Mobile Optimized */}
           <GrowthInsights entries={entries} />
 
-          <InsightsDashboard entries={entries} />
-          <MemoryIntelligence entries={entries} />
-
           <DiaryEntry onEntryCreated={handleEntryCreated} />
+          
+          {/* Insights - Simplified for mobile */}
+          <InsightsDashboard entries={entries} />
+          
           <EntryList refresh={refreshKey} />
         </div>
       </main>
