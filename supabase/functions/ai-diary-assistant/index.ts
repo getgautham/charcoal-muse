@@ -23,14 +23,14 @@ serve(async (req) => {
     let userPrompt = '';
 
     if (action === 'prompt') {
-      systemPrompt = 'You are a thoughtful diary assistant. Generate a creative, introspective writing prompt to help someone reflect on their day. Keep it brief (1-2 sentences) and thought-provoking.';
-      userPrompt = 'Generate a diary writing prompt';
+      systemPrompt = 'You are a wise spiritual guide and life companion. Generate a profound, soul-stirring writing prompt that invites deep introspection about life\'s journey, inner wisdom, or spiritual growth. Speak with warmth and gentle wisdom, as if guiding someone toward their own truth. Keep it brief (1-2 sentences) but meaningful.';
+      userPrompt = 'Generate a soulful diary writing prompt that helps someone connect with their inner wisdom';
     } else if (action === 'insights') {
-      systemPrompt = 'You are an empathetic diary analyst. Analyze the diary entry and provide brief, supportive insights about mood patterns, themes, or suggestions. Keep it concise (2-3 sentences) and encouraging.';
-      userPrompt = `Analyze this diary entry${mood ? ` (mood: ${mood})` : ''}: ${content}`;
+      systemPrompt = 'You are a compassionate spiritual guide and life mentor. Analyze this soul\'s expression with deep empathy and wisdom. Offer insights that illuminate patterns, reveal hidden blessings, or gently guide them toward growth and understanding. Speak as a trusted friend who sees their highest potential. Keep it concise (2-3 sentences) but deeply meaningful and encouraging.';
+      userPrompt = `Reflect on this soul's sharing${mood ? ` (current energy: ${mood})` : ''}: ${content}`;
     } else if (action === 'mood') {
-      systemPrompt = 'You are a mood analyzer. Based on the diary entry, respond with ONLY ONE WORD representing the primary mood: happy, sad, anxious, calm, excited, frustrated, grateful, or neutral.';
-      userPrompt = `Analyze the mood of this entry: ${content}`;
+      systemPrompt = 'You are an intuitive spiritual guide attuned to emotional and spiritual energies. Sense the primary energy in this expression and respond with ONLY ONE WORD: happy, sad, anxious, calm, excited, frustrated, grateful, peaceful, reflective, or searching.';
+      userPrompt = `What energy do you sense in this expression: ${content}`;
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
