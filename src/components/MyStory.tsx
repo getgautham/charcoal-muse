@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Entry } from "@/hooks/useEntries";
-import { TrendingUp, Activity, Calendar } from "react-feather";
+import { Activity, Calendar, Sun } from "react-feather";
 import { EMOTION_COLORS, EmotionKey } from "@/utils/emotionColors";
 
 interface MyStoryProps {
@@ -13,15 +12,21 @@ export const MyStory = ({ entries }: MyStoryProps) => {
   const stats = useMemo(() => {
     if (entries.length === 0) return null;
 
-    // Timeline data (last 14 days)
-    const last14Days = Array.from({ length: 14 }, (_, i) => {
+    // Calculate streak
+    const streak = entries.filter(e => {
+      const diff = Date.now() - new Date(e.created_at).getTime();
+      return diff < 7 * 24 * 60 * 60 * 1000;
+    }).length;
+
+    // Timeline data (last 30 days for larger view)
+    const last30Days = Array.from({ length: 30 }, (_, i) => {
       const date = new Date();
-      date.setDate(date.getDate() - (13 - i));
+      date.setDate(date.getDate() - (29 - i));
       date.setHours(0, 0, 0, 0);
       return date;
     });
 
-    const timelineData = last14Days.map(date => {
+    const timelineData = last30Days.map(date => {
       const dayEntries = entries.filter(e => {
         const entryDate = new Date(e.created_at);
         entryDate.setHours(0, 0, 0, 0);
@@ -35,43 +40,28 @@ export const MyStory = ({ entries }: MyStoryProps) => {
       const dominantMood = moods.length > 0 ? moods[0] : null;
 
       return {
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         count: dayEntries.length,
         mood: dominantMood,
         hasEntry: dayEntries.length > 0
       };
     });
 
-    // Mood distribution
+    // Get dominant mood
     const moodCounts = entries
       .filter(e => e.mood)
       .reduce((acc, e) => {
         const mood = e.mood!.toLowerCase();
-        const mappedMood = EMOTION_COLORS[mood as EmotionKey]?.label || mood;
-        acc[mappedMood] = (acc[mappedMood] || 0) + 1;
+        acc[mood] = (acc[mood] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-    const totalMoods = Object.values(moodCounts).reduce((a, b) => a + b, 0);
-    const moodDistribution = Object.entries(moodCounts)
-      .map(([mood, count]) => ({
-        mood,
-        count,
-        percentage: (count / totalMoods) * 100
-      }))
-      .sort((a, b) => b.count - a.count);
-
-    // Weekly summary
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    const weekEntries = entries.filter(e => new Date(e.created_at) >= weekAgo);
+    const dominantMood = Object.entries(moodCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || 'neutral';
 
     return {
+      streak,
+      dominantMood,
       timelineData,
-      moodDistribution,
-      weekCount: weekEntries.length,
-      totalCount: entries.length,
-      avgWords: Math.round(entries.reduce((sum, e) => sum + e.content.split(' ').length, 0) / entries.length)
+      totalCount: entries.length
     };
   }, [entries]);
 
@@ -86,127 +76,93 @@ export const MyStory = ({ entries }: MyStoryProps) => {
     );
   }
 
+  const dominantMoodColor = EMOTION_COLORS[stats.dominantMood as EmotionKey];
+
   return (
-    <div className="space-y-4 pb-6">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="p-3 bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
-          <div className="text-2xl font-bold text-primary">{stats.weekCount}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">this week</div>
+    <div className="space-y-6 pb-6">
+      {/* Simplified Large Key Stats */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+          <div className="flex flex-col">
+            <Calendar className="w-7 h-7 text-primary mb-3" />
+            <div className="text-5xl font-bold text-foreground mb-1">{stats.streak}</div>
+            <div className="text-sm text-muted-foreground">Day Streak</div>
+          </div>
         </Card>
-        <Card className="p-3 bg-gradient-to-br from-accent/10 to-transparent border-accent/20">
-          <div className="text-2xl font-bold text-accent">{stats.totalCount}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">all time</div>
-        </Card>
-        <Card className="p-3 bg-gradient-to-br from-secondary/10 to-transparent border-secondary/20">
-          <div className="text-2xl font-bold text-secondary">{stats.avgWords}</div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">avg words</div>
+        
+        <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+          <div className="flex flex-col">
+            <div 
+              className="w-7 h-7 rounded-full mb-3"
+              style={{ backgroundColor: dominantMoodColor?.text }}
+            />
+            <div className="text-xl font-bold text-foreground capitalize mb-1">
+              {dominantMoodColor?.label || stats.dominantMood}
+            </div>
+            <div className="text-sm text-muted-foreground">Your Vibe</div>
+          </div>
         </Card>
       </div>
 
-      {/* Modern Timeline */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold">Activity</h3>
-          <Calendar className="w-4 h-4 text-muted-foreground" />
+      {/* Large 30-Day Activity Grid */}
+      <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
+        <div className="flex items-center gap-2 mb-5">
+          <Calendar className="w-5 h-5 text-primary" />
+          <h3 className="text-base font-semibold">Last 30 Days</h3>
         </div>
-        <div className="space-y-2">
-          <div className="flex justify-between text-[10px] text-muted-foreground px-1">
-            <span>2 weeks ago</span>
-            <span>today</span>
-          </div>
-          <div className="flex gap-1">
-            {stats.timelineData.map((day, i) => {
-              const emotionColor = day.mood ? EMOTION_COLORS[day.mood as EmotionKey] : null;
-              return (
-                <div
-                  key={i}
-                  className="flex-1 rounded-sm transition-all hover:scale-110 cursor-pointer"
-                  style={{
-                    height: `${Math.max(24, day.count * 16)}px`,
-                    backgroundColor: day.hasEntry
-                      ? emotionColor?.text || 'hsl(var(--primary))'
-                      : 'hsl(var(--muted))',
-                    opacity: day.hasEntry ? 0.8 : 0.2
-                  }}
-                  title={`${day.date}: ${day.count} ${day.count === 1 ? 'entry' : 'entries'}`}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </Card>
-
-      {/* Mood Distribution */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold">Emotional Patterns</h3>
-          <TrendingUp className="w-4 h-4 text-muted-foreground" />
-        </div>
-        <div className="space-y-3">
-          {stats.moodDistribution.slice(0, 6).map((item) => {
-            const moodKey = item.mood.toLowerCase() as EmotionKey;
-            const color = EMOTION_COLORS[moodKey]?.text || 'hsl(var(--primary))';
+        <div className="grid grid-cols-10 gap-2">
+          {stats.timelineData.map((day, i) => {
+            const emotionColor = day.mood ? EMOTION_COLORS[day.mood as EmotionKey] : null;
+            const bgColor = day.count > 0 
+              ? (emotionColor?.bg || 'hsl(var(--primary)/0.3)') 
+              : 'hsl(var(--muted)/0.2)';
+            
             return (
-              <div key={item.mood}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium capitalize">{item.mood}</span>
-                  <span className="text-xs text-muted-foreground">{item.count}</span>
-                </div>
-                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${item.percentage}%`,
-                      backgroundColor: color
-                    }}
-                  />
-                </div>
-              </div>
+              <div
+                key={i}
+                className="aspect-square rounded-lg transition-all duration-300 hover:scale-110"
+                style={{ backgroundColor: bgColor }}
+              />
             );
           })}
         </div>
       </Card>
 
-      {/* Recent Entries Preview */}
-      <Card className="p-4">
-        <h3 className="text-sm font-semibold mb-3">Recent Reflections</h3>
-        <div className="space-y-3">
-          {entries.slice(0, 5).map((entry) => {
-            const moodColor = entry.mood
-              ? EMOTION_COLORS[entry.mood.toLowerCase() as EmotionKey]
-              : null;
+      {/* Recent Moments - Larger Cards */}
+      <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
+        <div className="flex items-center gap-2 mb-5">
+          <Sun className="w-5 h-5 text-primary" />
+          <h3 className="text-base font-semibold">Recent Moments</h3>
+        </div>
+        <div className="space-y-4">
+          {entries.slice(0, 5).map(entry => {
+            const emotionColor = entry.mood ? EMOTION_COLORS[entry.mood.toLowerCase() as EmotionKey] : null;
             return (
-              <div
-                key={entry.id}
-                className="p-3 rounded-lg bg-muted/50 border border-border/50 hover:border-primary/30 transition-colors"
-              >
-                <div className="flex items-start justify-between mb-1">
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(entry.created_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
-                  {moodColor && (
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] px-2 py-0"
-                      style={{
-                        borderColor: moodColor.text,
-                        color: moodColor.text,
-                        backgroundColor: moodColor.bg
-                      }}
-                    >
-                      {moodColor.label}
-                    </Badge>
+              <div key={entry.id} className="p-5 rounded-xl bg-background/60 border border-border/50">
+                <div className="flex items-start gap-3 mb-2">
+                  {emotionColor && (
+                    <div 
+                      className="w-3 h-3 rounded-full mt-1 shrink-0"
+                      style={{ backgroundColor: emotionColor.text }}
+                    />
                   )}
+                  <p className="text-sm text-foreground/90 line-clamp-3 flex-1 leading-relaxed">
+                    {entry.content}
+                  </p>
                 </div>
-                <p className="text-sm line-clamp-2 text-foreground/80">
-                  {entry.content}
-                </p>
+                {entry.ai_insights && (
+                  <p className="text-xs text-muted-foreground/80 italic ml-6 mb-2">
+                    "{entry.ai_insights}"
+                  </p>
+                )}
+                <div className="text-xs text-muted-foreground ml-6">
+                  {new Date(entry.created_at).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
               </div>
             );
           })}

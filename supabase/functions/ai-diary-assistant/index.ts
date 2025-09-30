@@ -36,17 +36,17 @@ serve(async (req) => {
       systemPrompt = `You are a thoughtful companion helping ${userName} with their personal journal. Generate prompts that match their ${promptStyle} style. Keep it conversational, brief (1-2 sentences), and genuinely curious.`;
       userPrompt = stylePrompts[promptStyle as keyof typeof stylePrompts] || stylePrompts.reflective;
     } else if (action === 'insights') {
-      // Build context from recent entries
-      let context = '';
+      // Build context from recent moods
+      let moodContext = '';
       if (recentEntries && recentEntries.length > 0) {
         const recentMoods = recentEntries.filter((e: any) => e.mood).map((e: any) => e.mood);
         if (recentMoods.length > 0) {
-          context = `\n\nRecent emotional patterns: ${recentMoods.join(', ')}`;
+          moodContext = ` Recent pattern: ${recentMoods.slice(0, 3).join(', ')}`;
         }
       }
 
-      systemPrompt = `You are a perceptive growth coach helping ${userName} understand themselves better through emotional intelligence. Using Ekman's 6 core emotions (happiness, sadness, fear, anger, surprise, disgust), analyze their writing with empathy and insight. Notice patterns, celebrate growth, and offer gentle observations that help them see themselves more clearly. Focus on personal growth and self-awareness. Keep it concise (2-3 sentences) but meaningful and actionable.`;
-      userPrompt = `${userName} just wrote this${mood ? ` (feeling ${mood})` : ''}: "${content}"${context}\n\nWhat growth opportunity or insight can you offer? What might this emotion be teaching them?`;
+      systemPrompt = `You are a concise journaling companion. Respond with ONLY a brief one-liner (max 12 words) that acknowledges their feeling with gentle insight or encouragement.${moodContext}`;
+      userPrompt = `Entry: "${content}"`;
     } else if (action === 'mood') {
       systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';
       userPrompt = `Emotion in: "${content}"`;

@@ -32,13 +32,42 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   const preferences = useUserPreferences();
   const { entries } = useEntries();
 
+  // Load persisted messages
   useEffect(() => {
+    loadMessages();
     loadDailyPrompt();
   }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const loadMessages = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('timestamp', { ascending: true });
+
+      if (error) throw error;
+      if (data) {
+        setMessages(data.map(msg => ({
+          id: msg.id,
+          type: msg.type as 'user' | 'ai' | 'prompt',
+          content: msg.content,
+          mood: msg.mood || undefined,
+          highlights: msg.highlights as Array<{ text: string; emotion: string }> || undefined,
+          timestamp: msg.timestamp
+        })));
+      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  };
 
   // Listen for preset selection
   useEffect(() => {
@@ -164,14 +193,32 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
 
       setMessages(prev => [...prev, aiMessage]);
 
-      // Save to database
-      await supabase.from('diary_entries').insert({
-        user_id: user.id,
-        title: null,
-        content: currentInput,
-        mood: detectedMood,
-        ai_insights: insights,
-      });
+      // Save messages to chat_messages table
+      await Promise.all([
+        supabase.from('chat_messages').insert({
+          user_id: user.id,
+          type: 'user',
+          content: currentInput,
+          mood: detectedMood,
+          highlights: highlights,
+          timestamp: userMessage.timestamp
+        }),
+        supabase.from('chat_messages').insert({
+          user_id: user.id,
+          type: 'ai',
+          content: insights,
+          mood: detectedMood,
+          timestamp: aiMessage.timestamp
+        }),
+        // Save to diary_entries for history
+        supabase.from('diary_entries').insert({
+          user_id: user.id,
+          title: null,
+          content: currentInput,
+          mood: detectedMood,
+          ai_insights: insights,
+        })
+      ]);
 
       onEntryCreated();
       loadDailyPrompt(); // Get new prompt

@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          content: string
+          highlights: Json | null
+          id: string
+          mood: string | null
+          timestamp: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          highlights?: Json | null
+          id?: string
+          mood?: string | null
+          timestamp?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          highlights?: Json | null
+          id?: string
+          mood?: string | null
+          timestamp?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       diary_entries: {
         Row: {
           ai_insights: string | null
