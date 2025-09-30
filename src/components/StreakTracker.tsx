@@ -81,7 +81,7 @@ const StreakTracker = () => {
               <Flame className={`w-8 h-8 ${streak > 0 ? 'text-accent' : 'text-muted-foreground'}`} />
             </div>
             <div className="text-2xl font-bold text-foreground">{streak}</div>
-            <div className="text-xs text-muted-foreground">Day Streak</div>
+            <div className="text-xs text-muted-foreground">days in a row</div>
           </div>
           
           <div className="text-center">
@@ -89,7 +89,7 @@ const StreakTracker = () => {
               <TrendingUp className="w-8 h-8 text-primary" />
             </div>
             <div className="text-2xl font-bold text-foreground">{thisWeek}</div>
-            <div className="text-xs text-muted-foreground">This Week</div>
+            <div className="text-xs text-muted-foreground">past 7 days</div>
           </div>
           
           <div className="text-center">
@@ -97,17 +97,17 @@ const StreakTracker = () => {
               <Target className="w-8 h-8 text-accent" />
             </div>
             <div className="text-2xl font-bold text-foreground">{totalEntries}</div>
-            <div className="text-xs text-muted-foreground">Total Entries</div>
+            <div className="text-xs text-muted-foreground">all time</div>
           </div>
         </div>
 
         {streak > 0 && (
           <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-accent/20 to-primary/20 border border-accent/30">
             <p className="text-sm text-center text-foreground font-medium">
-              {streak === 1 && "🎉 Great start! Keep it up!"}
-              {streak >= 2 && streak < 7 && `🔥 ${streak} days strong! You're building a habit!`}
-              {streak >= 7 && streak < 30 && `⭐ Amazing ${streak} day streak! You're on fire!`}
-              {streak >= 30 && `🏆 Incredible ${streak} day streak! You're a journaling master!`}
+              {streak === 1 && "Nice! You showed up today 🙌"}
+              {streak >= 2 && streak < 7 && `${streak} days! You're on a roll 🔥`}
+              {streak >= 7 && streak < 30 && `Damn, ${streak} days straight! Keep vibing ⭐`}
+              {streak >= 30 && `${streak} days?! You're crushing it 🏆`}
             </p>
           </div>
         )}

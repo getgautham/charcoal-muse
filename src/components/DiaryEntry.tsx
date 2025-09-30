@@ -78,8 +78,8 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
 
       // Update streak and show celebration
       toast({
-        title: "✨ Entry Saved!",
-        description: "Keep up the great journaling habit!",
+        title: "✨ Saved",
+        description: "You're doing great, keep going!",
       });
 
       onEntryCreated();
@@ -115,7 +115,7 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
         {!aiResponse ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <Textarea
-              placeholder="What's on your mind today?"
+              placeholder="What's going on with you?"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={8}
@@ -132,12 +132,12 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Analyzing...
+                  Getting insights...
                 </>
               ) : (
                 <>
                   <Send className="mr-2 h-5 w-5" />
-                  Save & Get AI Insights
+                  Send It
                 </>
               )}
             </Button>
@@ -150,7 +150,7 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
 
             {mood && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Detected mood:</span>
+                <span className="text-sm text-muted-foreground">You're feeling:</span>
                 <Badge className="bg-accent/20 text-accent border-accent/30 capitalize">
                   {mood}
                 </Badge>
@@ -161,7 +161,7 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
               <div className="flex items-start gap-3 mb-2">
                 <Sparkles className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-foreground mb-2">AI Insights</h4>
+                  <h4 className="font-semibold text-foreground mb-2">What I'm picking up</h4>
                   <p className="text-foreground/90 text-sm leading-relaxed">{aiResponse}</p>
                 </div>
               </div>
@@ -171,7 +171,7 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
               onClick={handleNewEntry}
               className="w-full bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 h-12 text-base"
             >
-              Write Another Entry
+              Write More
             </Button>
           </div>
         )}

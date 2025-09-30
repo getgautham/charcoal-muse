@@ -36,10 +36,10 @@ export const WelcomeDialog = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             <Sparkles className="w-6 h-6 text-primary" />
-            Welcome to Muze
+            Hey, welcome to Muze
           </DialogTitle>
           <DialogDescription className="text-base">
-            Your AI-powered personal diary for introspective journaling
+            Your space for real talk with AI that actually gets it
           </DialogDescription>
         </DialogHeader>
 
@@ -49,9 +49,9 @@ export const WelcomeDialog = () => {
             <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50 border border-border">
               <BookOpen className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-sm">AI Writing Prompts</h4>
+                <h4 className="font-medium text-sm">Daily Prompts</h4>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Get inspired with personalized writing suggestions
+                  Get unstuck with thoughtful writing starters
                 </p>
               </div>
               <Badge variant="secondary" className="flex-shrink-0">New</Badge>
@@ -60,9 +60,9 @@ export const WelcomeDialog = () => {
             <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50 border border-border">
               <Target className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-sm">Mood Detection</h4>
+                <h4 className="font-medium text-sm">Mood Check-ins</h4>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Automatically analyze emotions in your entries
+                  See what vibes you're giving off
                 </p>
               </div>
             </div>
@@ -70,9 +70,9 @@ export const WelcomeDialog = () => {
             <div className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50 border border-border">
               <TrendingUp className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-sm">Streak Tracking</h4>
+                <h4 className="font-medium text-sm">Keep It Going</h4>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Build a consistent journaling habit
+                  Build momentum one entry at a time
                 </p>
               </div>
             </div>
@@ -81,8 +81,8 @@ export const WelcomeDialog = () => {
           {/* Progress indicator */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Getting started</span>
-              <span className="font-medium text-primary">Ready!</span>
+              <span className="text-muted-foreground">You're all set</span>
+              <span className="font-medium text-primary">Let's go!</span>
             </div>
             <Progress value={100} className="h-2" />
           </div>
@@ -93,14 +93,14 @@ export const WelcomeDialog = () => {
               onClick={handleClose} 
               className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             >
-              Start Writing
+              Let's Do This
             </Button>
             <Button 
               variant="outline" 
               onClick={handleClose}
               className="border-primary/30 hover:bg-primary/10"
             >
-              Maybe Later
+              Later
             </Button>
           </div>
         </div>

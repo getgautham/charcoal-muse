@@ -65,7 +65,7 @@ const EntryList = ({ refresh }: EntryListProps) => {
     return (
       <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
         <CardContent className="flex items-center justify-center h-48">
-          <p className="text-muted-foreground">Loading entries...</p>
+          <p className="text-muted-foreground">Loading your stuff...</p>
         </CardContent>
       </Card>
     );
@@ -76,12 +76,12 @@ const EntryList = ({ refresh }: EntryListProps) => {
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Heart className="h-6 w-6 text-accent" />
-          Your Journal
+          Past Entries
         </CardTitle>
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search your entries..."
+            placeholder="Search what you wrote..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 border-border/50 bg-background/50"
@@ -92,7 +92,7 @@ const EntryList = ({ refresh }: EntryListProps) => {
         {filteredEntries.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              {searchTerm ? "No entries found matching your search." : "No entries yet. Start writing!"}
+              {searchTerm ? "Nothing matched that search" : "Nothing here yet. Write something!"}
             </p>
           </div>
         ) : (
