@@ -54,63 +54,36 @@ export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
   }
 
   return (
-    <Card className="p-4">
-      <h2 className="text-base font-semibold mb-3">Quick Insights</h2>
+    <Card className="p-3 h-full">
+      <h2 className="text-xs font-semibold mb-3 text-muted-foreground uppercase tracking-wide">Quick Stats</h2>
       
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         {/* Dominant Mood */}
         {insights.dominantMood && (
-          <div className="p-3 rounded-lg bg-accent/10 border border-accent/30">
-            <p className="text-xs text-muted-foreground mb-1">Most Common</p>
-            <p className="text-sm font-semibold capitalize">{insights.dominantMood}</p>
+          <div className="p-2 rounded-lg bg-accent/10 border border-accent/30">
+            <p className="text-[10px] text-muted-foreground mb-0.5">Top Mood</p>
+            <p className="text-xs font-semibold capitalize truncate">{insights.dominantMood}</p>
           </div>
         )}
         
         {/* Entry Count */}
-        <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
-          <p className="text-xs text-muted-foreground mb-1">Total Entries</p>
-          <p className="text-sm font-semibold">{insights.totalEntries}</p>
+        <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
+          <p className="text-[10px] text-muted-foreground mb-0.5">Total</p>
+          <p className="text-xs font-semibold">{insights.totalEntries}</p>
         </div>
 
         {/* Avg Words */}
-        <div className="p-3 rounded-lg bg-secondary/10 border border-secondary/30">
-          <p className="text-xs text-muted-foreground mb-1">Avg Words</p>
-          <p className="text-sm font-semibold">{Math.round(insights.avgWordsPerEntry)}</p>
+        <div className="p-2 rounded-lg bg-secondary/10 border border-secondary/30">
+          <p className="text-[10px] text-muted-foreground mb-0.5">Avg Words</p>
+          <p className="text-xs font-semibold">{Math.round(insights.avgWordsPerEntry)}</p>
         </div>
 
         {/* Recent Entries */}
-        <div className="p-3 rounded-lg bg-accent/10 border border-accent/30">
-          <p className="text-xs text-muted-foreground mb-1">This Week</p>
-          <p className="text-sm font-semibold">{insights.recentEntries}</p>
+        <div className="p-2 rounded-lg bg-accent/10 border border-accent/30">
+          <p className="text-[10px] text-muted-foreground mb-0.5">This Week</p>
+          <p className="text-xs font-semibold">{insights.recentEntries}</p>
         </div>
       </div>
-
-      {/* Themes */}
-      {insights.themes.length > 0 && (
-        <div className="mt-3 p-3 rounded-lg bg-primary/10 border border-primary/20">
-          <div className="flex items-start gap-2">
-            <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-xs text-muted-foreground mb-2">Your Themes</p>
-              <div className="flex flex-wrap gap-1.5">
-                {insights.themes.map((theme, i) => (
-                  <Badge key={i} variant="outline" className="text-xs bg-primary/5 border-primary/30">
-                    {theme}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Latest AI Insight - Mobile Optimized */}
-      {insights.mostRecentInsight && (
-        <div className="mt-3 p-3 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-          <p className="text-xs text-muted-foreground mb-2">Latest Insight</p>
-          <p className="text-sm leading-relaxed">{insights.mostRecentInsight}</p>
-        </div>
-      )}
     </Card>
   );
 };
