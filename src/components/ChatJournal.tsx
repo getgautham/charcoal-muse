@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
-import { useEntries, Entry } from "@/hooks/useEntries";
-import { Send, RefreshCw } from "react-feather";
+import { useEntries } from "@/hooks/useEntries";
+import { Send } from "react-feather";
 import { EMOTION_COLORS, EmotionKey } from "@/utils/emotionColors";
 
 interface ChatMessage {
@@ -39,6 +39,24 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Listen for preset selection
+  useEffect(() => {
+    const handlePresetSelect = (e: any) => {
+      setPromptText(e.detail);
+    };
+    window.addEventListener('selectPreset', handlePresetSelect);
+    return () => window.removeEventListener('selectPreset', handlePresetSelect);
+  }, []);
+
+  // Listen for dice roll from parent
+  useEffect(() => {
+    const handleDiceRoll = () => {
+      loadDailyPrompt();
+    };
+    window.addEventListener('diceRoll', handleDiceRoll);
+    return () => window.removeEventListener('diceRoll', handleDiceRoll);
+  }, []);
 
   const loadDailyPrompt = async () => {
     try {
@@ -229,20 +247,12 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
       </div>
 
       {/* Fixed Bottom Input Area */}
-      <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border px-4 py-3 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border px-4 py-3 pb-safe">
         <div className="max-w-md mx-auto">
-          {/* Prompt with Dice Button */}
+          {/* Prompt Above Input */}
           {promptText && (
-            <div className="mb-3 p-3 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-2">
-              <p className="text-xs text-foreground/90 italic flex-1">{promptText}</p>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={loadDailyPrompt}
-                className="h-6 w-6 p-0 shrink-0"
-              >
-                <RefreshCw className="w-3 h-3" />
-              </Button>
+            <div className="mb-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
+              <p className="text-xs text-foreground/70 italic">{promptText}</p>
             </div>
           )}
 
@@ -251,16 +261,16 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               placeholder="What's on your mind?"
-              className="flex-1 bg-input border-border/50 text-base"
+              className="flex-1 bg-input border-border/50 text-sm h-10 rounded-full"
               disabled={loading}
             />
             <Button
               onClick={handleSend}
               disabled={loading || !input.trim()}
               size="icon"
-              className="h-10 w-10 rounded-full bg-primary"
+              className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 shrink-0"
             >
               <Send className="w-4 h-4" />
             </Button>

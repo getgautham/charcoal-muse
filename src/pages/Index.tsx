@@ -5,12 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEntries } from "@/hooks/useEntries";
 import { ChatJournal } from "@/components/ChatJournal";
-import EntryList from "@/components/EntryList";
-import { InsightsDashboard } from "@/components/InsightsDashboard";
-import { EmotionalTimeline } from "@/components/EmotionalTimeline";
-import { GrowthInsights } from "@/components/GrowthInsights";
-import { KeyInsights } from "@/components/KeyInsights";
-import { MobileNav } from "@/components/MobileNav";
+import { MyStory } from "@/components/MyStory";
+import { TopNav } from "@/components/TopNav";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { LogOut, Sun } from "react-feather";
 import { Session } from "@supabase/supabase-js";
@@ -18,6 +14,7 @@ import { Session } from "@supabase/supabase-js";
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<'chat' | 'story'>('chat');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { entries } = useEntries(refreshKey);
@@ -60,6 +57,14 @@ const Index = () => {
     setRefreshKey(prev => prev + 1);
   };
 
+  const handleDiceClick = () => {
+    window.dispatchEvent(new Event('diceRoll'));
+  };
+
+  const handlePresetsClick = () => {
+    // Handled by TopNav component
+  };
+
   if (!session) {
     return null;
   }
@@ -68,69 +73,28 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <WelcomeDialog />
       
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/50 px-4 py-3">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Sun className="w-4 h-4 text-background" />
+      {/* Top Navigation with Tabs */}
+      <TopNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onDiceClick={handleDiceClick}
+        onPresetsClick={handlePresetsClick}
+      />
+
+      {/* Main Content Area */}
+      <div className="pt-14 h-screen overflow-hidden">
+        <div className="max-w-md mx-auto h-full">
+          {activeTab === 'chat' ? (
+            <div className="h-full">
+              <ChatJournal onEntryCreated={handleEntryCreated} />
             </div>
-            <span className="font-semibold text-lg">Muze</span>
-          </div>
-          <Button
-            onClick={handleSignOut}
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="w-4 h-4" />
-          </Button>
+          ) : (
+            <div className="h-full overflow-y-auto px-4 py-4">
+              <MyStory entries={entries} />
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="max-w-md mx-auto h-[calc(100vh-3.5rem)]">
-        {/* Chat Journal - Full Height */}
-        <div id="chat" className="h-full">
-          <ChatJournal onEntryCreated={handleEntryCreated} />
-        </div>
-      </div>
-
-      {/* Secondary Content - Hidden by default, accessible via scroll/nav */}
-      <div className="max-w-md mx-auto px-4 py-4 space-y-4 bg-background">
-        {/* Key Insights */}
-        <div id="insights" className="scroll-mt-20">
-          <KeyInsights entries={entries} />
-        </div>
-
-        {/* Recent Entries */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Sun className="w-4 h-4 text-accent" />
-            <h2 className="text-sm font-semibold">Recent Entries</h2>
-          </div>
-          <EntryList refresh={refreshKey} />
-        </div>
-
-        {/* Timeline */}
-        <div id="story" className="scroll-mt-20">
-          <div className="mb-4">
-            <EmotionalTimeline entries={entries} />
-          </div>
-
-          {/* Asymmetric grid */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <GrowthInsights entries={entries} />
-            </div>
-            <div className="col-span-1">
-              <InsightsDashboard entries={entries} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      <MobileNav />
     </div>
   );
 };
