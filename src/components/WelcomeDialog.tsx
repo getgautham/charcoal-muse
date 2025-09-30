@@ -36,7 +36,7 @@ export const WelcomeDialog = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             <Sparkles className="w-6 h-6 text-primary" />
-            Welcome to Charcoal Muse
+            Welcome to Muze
           </DialogTitle>
           <DialogDescription className="text-base">
             Your AI-powered personal diary for introspective journaling
