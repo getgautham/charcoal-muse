@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import DiaryEntry from "@/components/DiaryEntry";
 import EntryList from "@/components/EntryList";
+import StreakTracker from "@/components/StreakTracker";
 import { LogOut, BookOpen } from "lucide-react";
 import { Session } from "@supabase/supabase-js";
 
@@ -81,7 +82,8 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="space-y-8">
+        <div className="space-y-6">
+          <StreakTracker />
           <DiaryEntry onEntryCreated={handleEntryCreated} />
           <EntryList refresh={refreshKey} />
         </div>

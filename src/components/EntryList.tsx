@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { Calendar, Heart } from "lucide-react";
+import { Calendar, Heart, Search } from "lucide-react";
 
 interface Entry {
   id: string;
@@ -21,11 +22,26 @@ interface EntryListProps {
 
 const EntryList = ({ refresh }: EntryListProps) => {
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [filteredEntries, setFilteredEntries] = useState<Entry[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadEntries();
   }, [refresh]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredEntries(entries);
+    } else {
+      const filtered = entries.filter(entry => 
+        entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entry.mood?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entry.ai_insights?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredEntries(filtered);
+    }
+  }, [searchTerm, entries]);
 
   const loadEntries = async () => {
     try {
@@ -33,11 +49,11 @@ const EntryList = ({ refresh }: EntryListProps) => {
       const { data, error } = await supabase
         .from('diary_entries')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setEntries(data || []);
+      setFilteredEntries(data || []);
     } catch (error) {
       console.error('Error loading entries:', error);
     } finally {
@@ -60,18 +76,29 @@ const EntryList = ({ refresh }: EntryListProps) => {
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Heart className="h-6 w-6 text-accent" />
-          Recent Entries
+          Your Journal
         </CardTitle>
+        <div className="relative mt-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search your entries..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 border-border/50 bg-background/50"
+          />
+        </div>
       </CardHeader>
       <CardContent>
-        {entries.length === 0 ? (
+        {filteredEntries.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No entries yet. Start writing!</p>
+            <p className="text-muted-foreground">
+              {searchTerm ? "No entries found matching your search." : "No entries yet. Start writing!"}
+            </p>
           </div>
         ) : (
           <ScrollArea className="h-[500px] pr-4">
             <div className="space-y-4">
-              {entries.map((entry) => (
+              {filteredEntries.map((entry) => (
                 <div
                   key={entry.id}
                   className="p-4 rounded-lg bg-background/50 border border-border/50 hover:border-primary/30 transition-all"
