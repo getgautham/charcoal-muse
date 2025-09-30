@@ -9,6 +9,8 @@ import EntryList from "@/components/EntryList";
 import StreakTracker from "@/components/StreakTracker";
 import { InsightsDashboard } from "@/components/InsightsDashboard";
 import { MemoryIntelligence } from "@/components/MemoryIntelligence";
+import { EmotionBubbles } from "@/components/EmotionBubbles";
+import { GrowthInsights } from "@/components/GrowthInsights";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { LogOut, FileText } from "react-feather";
 import { Session } from "@supabase/supabase-js";
@@ -90,8 +92,16 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
           <StreakTracker />
-        <InsightsDashboard entries={entries} />
-        <MemoryIntelligence entries={entries} />
+
+          {/* Main Feature - Emotion Visualization */}
+          <EmotionBubbles entries={entries} />
+
+          {/* Growth Engine */}
+          <GrowthInsights entries={entries} />
+
+          <InsightsDashboard entries={entries} />
+          <MemoryIntelligence entries={entries} />
+
           <DiaryEntry onEntryCreated={handleEntryCreated} />
           <EntryList refresh={refreshKey} />
         </div>

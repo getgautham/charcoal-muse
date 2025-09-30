@@ -163,11 +163,22 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
           </form>
         ) : (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Mood Badge - More Prominent */}
+            {/* Mood Badge with Ekman Color Coding */}
             {mood && (
-              <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-accent/10 border border-accent/30">
-                <span className="text-base text-muted-foreground">Energy:</span>
-                <Badge className="bg-accent/20 text-accent border-accent/30 capitalize text-base px-4 py-1.5">
+              <div className="flex items-center justify-center gap-3 p-4 rounded-lg border-2"
+                style={{
+                  backgroundColor: `hsl(var(--emotion-${mood}))10`,
+                  borderColor: `hsl(var(--emotion-${mood}))`
+                }}
+              >
+                <span className="text-base text-muted-foreground">Core emotion:</span>
+                <Badge 
+                  className="capitalize text-base px-4 py-1.5 font-semibold"
+                  style={{
+                    backgroundColor: `hsl(var(--emotion-${mood}))`,
+                    color: 'hsl(var(--background))'
+                  }}
+                >
                   {mood}
                 </Badge>
               </div>

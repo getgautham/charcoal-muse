@@ -41,15 +41,19 @@ serve(async (req) => {
       if (recentEntries && recentEntries.length > 0) {
         const recentMoods = recentEntries.filter((e: any) => e.mood).map((e: any) => e.mood);
         if (recentMoods.length > 0) {
-          context = `\n\nRecent energy patterns: ${recentMoods.join(', ')}`;
+          context = `\n\nRecent emotional patterns: ${recentMoods.join(', ')}`;
         }
       }
 
-      systemPrompt = `You are a perceptive companion who helps ${userName} understand themselves better. Analyze their writing with genuine empathy. Notice patterns, celebrate growth, and offer gentle insights that help them see themselves more clearly. Be conversational and supportive. Keep it concise (2-3 sentences) but meaningful.`;
-      userPrompt = `${userName} just wrote this${mood ? ` (feeling ${mood})` : ''}: "${content}"${context}\n\nWhat do you notice? What might this tell them about themselves?`;
+      systemPrompt = `You are a perceptive growth coach helping ${userName} understand themselves better through emotional intelligence. Using Ekman's 6 core emotions (happiness, sadness, fear, anger, surprise, disgust), analyze their writing with empathy and insight. Notice patterns, celebrate growth, and offer gentle observations that help them see themselves more clearly. Focus on personal growth and self-awareness. Keep it concise (2-3 sentences) but meaningful and actionable.`;
+      userPrompt = `${userName} just wrote this${mood ? ` (feeling ${mood})` : ''}: "${content}"${context}\n\nWhat growth opportunity or insight can you offer? What might this emotion be teaching them?`;
     } else if (action === 'mood') {
-      systemPrompt = 'Detect the primary emotion. Respond with ONLY ONE WORD: happy, sad, anxious, calm, excited, frustrated, grateful, peaceful, reflective, hopeful, overwhelmed, or content.';
+      systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';
       userPrompt = `Emotion in: "${content}"`;
+    } else if (action === 'growth') {
+      // New growth insights based on patterns
+      systemPrompt = `You are a personal growth AI analyzing ${userName}'s emotional patterns over time. Using Ekman's model, identify growth opportunities, emotional patterns, and actionable insights. Be specific, compassionate, and focused on self-improvement.`;
+      userPrompt = `Analyze these emotional patterns: ${JSON.stringify(recentEntries)}. What growth insights can you offer?`;
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

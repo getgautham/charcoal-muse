@@ -41,6 +41,14 @@ All colors MUST be HSL.
     --shadow-card: 0 4px 20px hsla(240, 15%, 8%, 0.4);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Ekman's 6 Core Emotions - Color System */
+    --emotion-happiness: 48 96% 53%;      /* Warm yellow */
+    --emotion-sadness: 221 83% 53%;       /* Deep blue */
+    --emotion-fear: 280 60% 50%;          /* Purple */
+    --emotion-anger: 0 72% 51%;           /* Red */
+    --emotion-surprise: 168 76% 42%;      /* Teal */
+    --emotion-disgust: 88 50% 53%;        /* Olive green */
   }
 
   .dark {
