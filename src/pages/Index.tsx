@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEntries } from "@/hooks/useEntries";
-import DiaryEntry from "@/components/DiaryEntry";
+import { ChatJournal } from "@/components/ChatJournal";
 import EntryList from "@/components/EntryList";
 import { InsightsDashboard } from "@/components/InsightsDashboard";
 import { EmotionalTimeline } from "@/components/EmotionalTimeline";
@@ -65,7 +65,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       <WelcomeDialog />
       
       {/* Header */}
@@ -88,16 +88,21 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4 py-4 space-y-4">
-        {/* Key Insights - Top Priority */}
-        <KeyInsights entries={entries} />
+      <div className="max-w-md mx-auto h-[calc(100vh-3.5rem)]">
+        {/* Chat Journal - Full Height */}
+        <div id="chat" className="h-full">
+          <ChatJournal onEntryCreated={handleEntryCreated} />
+        </div>
+      </div>
 
-        {/* Write Section - Highest Value */}
-        <div id="write" className="scroll-mt-20">
-          <DiaryEntry onEntryCreated={handleEntryCreated} />
+      {/* Secondary Content - Hidden by default, accessible via scroll/nav */}
+      <div className="max-w-md mx-auto px-4 py-4 space-y-4 bg-background">
+        {/* Key Insights */}
+        <div id="insights" className="scroll-mt-20">
+          <KeyInsights entries={entries} />
         </div>
 
-        {/* Recent Entries with bulb icon */}
+        {/* Recent Entries */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Sun className="w-4 h-4 text-accent" />
@@ -106,22 +111,18 @@ const Index = () => {
           <EntryList refresh={refreshKey} />
         </div>
 
-        {/* Asymmetrical Designer Grid */}
+        {/* Timeline */}
         <div id="story" className="scroll-mt-20">
-          {/* Large feature - Timeline */}
           <div className="mb-4">
             <EmotionalTimeline entries={entries} />
           </div>
 
-          {/* Two-column asymmetric layout */}
+          {/* Asymmetric grid */}
           <div className="grid grid-cols-3 gap-4">
-            {/* Tall left card - Growth Insights (takes 2/3 width) */}
             <div className="col-span-2">
               <GrowthInsights entries={entries} />
             </div>
-
-            {/* Compact right card - Quick Insights (takes 1/3 width) */}
-            <div id="insights" className="scroll-mt-20 col-span-1">
+            <div className="col-span-1">
               <InsightsDashboard entries={entries} />
             </div>
           </div>
