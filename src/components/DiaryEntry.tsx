@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Send, Sparkles, Lightbulb } from "lucide-react";
+import { PaperAirplaneIcon, SparklesIcon, LightBulbIcon } from "@heroicons/react/24/outline";
 
 interface DiaryEntryProps {
   onEntryCreated: () => void;
@@ -106,8 +106,8 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
     <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
       <CardContent className="p-6">
         {showPrompt && promptText && (
-          <div className="mb-4 p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
-            <Lightbulb className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+          <div className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
+            <LightBulbIcon className="w-5 h-5 text-accent shrink-0 mt-0.5" />
             <p className="text-sm text-foreground/90 italic">{promptText}</p>
           </div>
         )}
@@ -130,43 +130,42 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
               className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 h-12 text-base"
             >
               {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span className="flex items-center gap-2">
+                  <SparklesIcon className="w-5 h-5 animate-pulse" />
                   Getting insights...
-                </>
+                </span>
               ) : (
-                <>
-                  <Send className="mr-2 h-5 w-5" />
+                <span className="flex items-center gap-2">
+                  <PaperAirplaneIcon className="w-5 h-5" />
                   Send It
-                </>
+                </span>
               )}
             </Button>
           </form>
         ) : (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="p-4 rounded-lg bg-background/50 border border-border/50">
-              <p className="text-foreground/80 text-sm whitespace-pre-wrap">{content}</p>
-            </div>
-
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Mood Badge - More Prominent */}
             {mood && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">You're feeling:</span>
-                <Badge className="bg-accent/20 text-accent border-accent/30 capitalize">
+              <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-accent/10 border border-accent/30">
+                <span className="text-base text-muted-foreground">Vibe check:</span>
+                <Badge className="bg-accent/20 text-accent border-accent/30 capitalize text-base px-4 py-1.5">
                   {mood}
                 </Badge>
               </div>
             )}
 
-            <div className="p-4 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-              <div className="flex items-start gap-3 mb-2">
-                <Sparkles className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-foreground mb-2">What I'm picking up</h4>
-                  <p className="text-foreground/90 text-sm leading-relaxed">{aiResponse}</p>
+            {/* AI Insights - Main Focus */}
+            <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
+              <div className="flex items-start gap-3">
+                <SparklesIcon className="w-6 h-6 text-accent shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-foreground mb-3 text-lg">What I'm picking up</h4>
+                  <p className="text-foreground/90 text-base leading-relaxed">{aiResponse}</p>
                 </div>
               </div>
             </div>
 
+            {/* Single CTA */}
             <Button
               onClick={handleNewEntry}
               className="w-full bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 h-12 text-base"
