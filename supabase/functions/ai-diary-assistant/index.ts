@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, content, mood } = await req.json();
+    const { action, content, mood, preferences, recentEntries } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -22,15 +22,34 @@ serve(async (req) => {
     let systemPrompt = '';
     let userPrompt = '';
 
+    // Personalize based on user preferences
+    const userName = preferences?.displayName || 'friend';
+    const promptStyle = preferences?.promptStyle || 'reflective';
+
     if (action === 'prompt') {
-      systemPrompt = 'You are a wise spiritual guide and life companion. Generate a profound, soul-stirring writing prompt that invites deep introspection about life\'s journey, inner wisdom, or spiritual growth. Speak with warmth and gentle wisdom, as if guiding someone toward their own truth. Keep it brief (1-2 sentences) but meaningful.';
-      userPrompt = 'Generate a soulful diary writing prompt that helps someone connect with their inner wisdom';
+      const stylePrompts = {
+        reflective: 'Generate a thought-provoking prompt about self-discovery, emotions, or life patterns',
+        creative: 'Generate an imaginative prompt that sparks creative thinking or storytelling',
+        practical: 'Generate a practical prompt about goals, plans, or daily reflections'
+      };
+
+      systemPrompt = `You are a thoughtful companion helping ${userName} with their personal journal. Generate prompts that match their ${promptStyle} style. Keep it conversational, brief (1-2 sentences), and genuinely curious.`;
+      userPrompt = stylePrompts[promptStyle as keyof typeof stylePrompts] || stylePrompts.reflective;
     } else if (action === 'insights') {
-      systemPrompt = 'You are a compassionate spiritual guide and life mentor. Analyze this soul\'s expression with deep empathy and wisdom. Offer insights that illuminate patterns, reveal hidden blessings, or gently guide them toward growth and understanding. Speak as a trusted friend who sees their highest potential. Keep it concise (2-3 sentences) but deeply meaningful and encouraging.';
-      userPrompt = `Reflect on this soul's sharing${mood ? ` (current energy: ${mood})` : ''}: ${content}`;
+      // Build context from recent entries
+      let context = '';
+      if (recentEntries && recentEntries.length > 0) {
+        const recentMoods = recentEntries.filter((e: any) => e.mood).map((e: any) => e.mood);
+        if (recentMoods.length > 0) {
+          context = `\n\nRecent energy patterns: ${recentMoods.join(', ')}`;
+        }
+      }
+
+      systemPrompt = `You are a perceptive companion who helps ${userName} understand themselves better. Analyze their writing with genuine empathy. Notice patterns, celebrate growth, and offer gentle insights that help them see themselves more clearly. Be conversational and supportive. Keep it concise (2-3 sentences) but meaningful.`;
+      userPrompt = `${userName} just wrote this${mood ? ` (feeling ${mood})` : ''}: "${content}"${context}\n\nWhat do you notice? What might this tell them about themselves?`;
     } else if (action === 'mood') {
-      systemPrompt = 'You are an intuitive spiritual guide attuned to emotional and spiritual energies. Sense the primary energy in this expression and respond with ONLY ONE WORD: happy, sad, anxious, calm, excited, frustrated, grateful, peaceful, reflective, or searching.';
-      userPrompt = `What energy do you sense in this expression: ${content}`;
+      systemPrompt = 'Detect the primary emotion. Respond with ONLY ONE WORD: happy, sad, anxious, calm, excited, frustrated, grateful, peaceful, reflective, hopeful, overwhelmed, or content.';
+      userPrompt = `Emotion in: "${content}"`;
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -49,6 +68,18 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again in a moment.' }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'AI usage limit reached.' }), {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       const errorText = await response.text();
       console.error('AI gateway error:', response.status, errorText);
       throw new Error(`AI gateway error: ${response.status}`);

@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useEntries } from "@/hooks/useEntries";
 import DiaryEntry from "@/components/DiaryEntry";
 import EntryList from "@/components/EntryList";
 import StreakTracker from "@/components/StreakTracker";
+import { InsightsDashboard } from "@/components/InsightsDashboard";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { LogOut, BookOpen } from "lucide-react";
 import { Session } from "@supabase/supabase-js";
@@ -15,6 +17,7 @@ const Index = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { entries } = useEntries(refreshKey);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -86,6 +89,7 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
           <StreakTracker />
+          <InsightsDashboard entries={entries} />
           <DiaryEntry onEntryCreated={handleEntryCreated} />
           <EntryList refresh={refreshKey} />
         </div>

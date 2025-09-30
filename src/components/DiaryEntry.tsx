@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useEntries } from "@/hooks/useEntries";
 import { PaperAirplaneIcon, SparklesIcon, LightBulbIcon } from "@heroicons/react/24/outline";
 
 interface DiaryEntryProps {
@@ -19,6 +21,8 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
   const [showPrompt, setShowPrompt] = useState(true);
   const [promptText, setPromptText] = useState("");
   const { toast } = useToast();
+  const preferences = useUserPreferences();
+  const { entries } = useEntries();
 
   useEffect(() => {
     loadDailyPrompt();
@@ -27,7 +31,10 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
   const loadDailyPrompt = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('ai-diary-assistant', {
-        body: { action: 'prompt' }
+        body: { 
+          action: 'prompt',
+          preferences 
+        }
       });
       if (error) throw error;
       setPromptText(data.result);
@@ -46,13 +53,24 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Analyze mood and get insights simultaneously
+      // Get recent entries for context
+      const recentEntries = entries.slice(0, 5).map(e => ({
+        mood: e.mood,
+        created_at: e.created_at
+      }));
+
+      // Analyze mood and get insights simultaneously with personalization
       const [moodResponse, insightsResponse] = await Promise.all([
         supabase.functions.invoke('ai-diary-assistant', {
           body: { action: 'mood', content }
         }),
         supabase.functions.invoke('ai-diary-assistant', {
-          body: { action: 'insights', content }
+          body: { 
+            action: 'insights', 
+            content,
+            preferences,
+            recentEntries 
+          }
         })
       ]);
 
@@ -76,10 +94,11 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
 
       if (saveError) throw saveError;
 
-      // Update streak and show celebration
       toast({
         title: "✨ Saved",
-        description: "You're doing great, keep going!",
+        description: preferences.displayName 
+          ? `Nice one, ${preferences.displayName}!` 
+          : "You're doing great!",
       });
 
       onEntryCreated();
