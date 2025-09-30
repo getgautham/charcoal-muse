@@ -9,7 +9,7 @@ import EntryList from "@/components/EntryList";
 import StreakTracker from "@/components/StreakTracker";
 import { InsightsDashboard } from "@/components/InsightsDashboard";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
-import { LogOut, BookOpen } from "lucide-react";
+import { LogOut, FileText } from "react-feather";
 import { Session } from "@supabase/supabase-js";
 
 const Index = () => {
@@ -67,11 +67,11 @@ const Index = () => {
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-glow">
-              <BookOpen className="w-5 h-5 text-primary-foreground" />
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-card">
+              <FileText className="w-5 h-5 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              My Diary
+              Muze
             </h1>
           </div>
           <Button

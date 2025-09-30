@@ -2,13 +2,18 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Entry } from "@/hooks/useEntries";
-import { SparklesIcon, ChartBarIcon, HeartIcon } from "@heroicons/react/24/outline";
+import { Zap, TrendingUp, Heart } from "react-feather";
+import { MoodChart } from "./MoodChart";
+import { ActivityHeatmap } from "./ActivityHeatmap";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 interface InsightsDashboardProps {
   entries: Entry[];
 }
 
 export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
+  const preferences = useUserPreferences();
+  const visualStyle = preferences.displayName ? localStorage.getItem('visualStyle') || 'balanced' : 'balanced';
   const insights = useMemo(() => {
     if (entries.length === 0) return null;
 
@@ -53,36 +58,57 @@ export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
     return (
       <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
         <CardContent className="p-8 text-center">
-          <p className="text-muted-foreground">
-            Write a few entries to see patterns about yourself
+          <p className="text-muted-foreground text-sm">
+            Start writing to discover patterns about yourself
           </p>
         </CardContent>
       </Card>
     );
   }
 
+  const showDetailed = visualStyle === 'detailed';
+  const showMinimal = visualStyle === 'minimal';
+
   return (
     <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-card">
       <CardHeader>
         <CardTitle className="text-xl font-bold flex items-center gap-2">
-          <SparklesIcon className="w-6 h-6 text-accent" />
-          What I'm Learning About You
+          <Zap className="w-6 h-6 text-accent" />
+          Your Story So Far
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
+        {/* Mood Trend Chart */}
+        {!showMinimal && (
+          <div className="p-4 rounded-lg bg-background/50 border border-border/30">
+            <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" />
+              How you've been feeling
+            </h4>
+            <MoodChart entries={entries} visualStyle={visualStyle} />
+          </div>
+        )}
+
+        {/* Activity Heatmap - Only in detailed view */}
+        {showDetailed && entries.length >= 7 && (
+          <div className="p-4 rounded-lg bg-background/50 border border-border/30">
+            <h4 className="font-medium text-sm mb-3">Your writing rhythm</h4>
+            <ActivityHeatmap entries={entries} />
+          </div>
+        )}
         {/* Mood Pattern */}
         {insights.dominantMood && (
           <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
             <div className="flex items-start gap-3">
-              <HeartIcon className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+              <Heart className="w-5 h-5 text-accent shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h4 className="font-medium text-sm mb-1">Your Energy Lately</h4>
+                <h4 className="font-medium text-sm mb-1">Dominant vibe</h4>
                 <p className="text-sm text-muted-foreground">
-                  You've been feeling mostly{' '}
+                  Lately you've been{' '}
                   <Badge className="bg-accent/20 text-accent border-accent/30 mx-1">
                     {insights.dominantMood}
                   </Badge>
-                  {' '}based on your recent entries
+                  {!showMinimal && ' based on your recent writing'}
                 </p>
               </div>
             </div>
@@ -93,9 +119,9 @@ export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
         {insights.themes.length > 0 && (
           <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
             <div className="flex items-start gap-3">
-              <ChartBarIcon className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+              <TrendingUp className="w-5 h-5 text-primary shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h4 className="font-medium text-sm mb-2">What You're Thinking About</h4>
+                <h4 className="font-medium text-sm mb-2">Top themes</h4>
                 <div className="flex flex-wrap gap-2">
                   {insights.themes.map((theme, i) => (
                     <Badge key={i} variant="outline" className="bg-primary/5 border-primary/30">
@@ -109,7 +135,8 @@ export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
         )}
 
         {/* Activity Stats */}
-        <div className="grid grid-cols-2 gap-3">
+        {!showMinimal && (
+          <div className="grid grid-cols-2 gap-3">
           <div className="p-3 rounded-lg bg-background/50 border border-border/30">
             <div className="text-2xl font-bold text-foreground">{insights.recentEntries}</div>
             <div className="text-xs text-muted-foreground">entries this week</div>
@@ -119,11 +146,12 @@ export const InsightsDashboard = ({ entries }: InsightsDashboardProps) => {
             <div className="text-xs text-muted-foreground">avg words/entry</div>
           </div>
         </div>
+        )}
 
         {/* Latest Deep Insight */}
-        {insights.mostRecentInsight && (
+        {insights.mostRecentInsight && !showMinimal && (
           <div className="p-4 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-            <p className="text-xs text-muted-foreground mb-1">Latest insight</p>
+            <p className="text-xs text-muted-foreground mb-1">Most recent take</p>
             <p className="text-sm text-foreground/90 italic leading-relaxed">
               "{insights.mostRecentInsight}"
             </p>

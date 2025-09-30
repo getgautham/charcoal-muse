@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Flame, Target, TrendingUp } from "lucide-react";
+import { Activity, Target, TrendingUp } from "react-feather";
 
 const StreakTracker = () => {
   const [streak, setStreak] = useState(0);
@@ -78,7 +78,7 @@ const StreakTracker = () => {
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
-              <Flame className={`w-8 h-8 ${streak > 0 ? 'text-accent' : 'text-muted-foreground'}`} />
+              <Activity className={`w-8 h-8 ${streak > 0 ? 'text-accent' : 'text-muted-foreground'}`} />
             </div>
             <div className="text-2xl font-bold text-foreground">{streak}</div>
             <div className="text-xs text-muted-foreground">days in a row</div>

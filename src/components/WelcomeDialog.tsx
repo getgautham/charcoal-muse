@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CheckCircleIcon, UserCircleIcon, ClockIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { CheckCircle, User, Clock, Zap, BarChart2 } from "react-feather";
 import { Progress } from "@/components/ui/progress";
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4;
 
 export const WelcomeDialog = () => {
   const [open, setOpen] = useState(false);
@@ -21,6 +21,7 @@ export const WelcomeDialog = () => {
   const [displayName, setDisplayName] = useState("");
   const [writingFrequency, setWritingFrequency] = useState("daily");
   const [promptStyle, setPromptStyle] = useState("reflective");
+  const [visualStyle, setVisualStyle] = useState("detailed");
 
   useEffect(() => {
     const lastSeen = localStorage.getItem("welcomeDialogSeen");
@@ -34,7 +35,7 @@ export const WelcomeDialog = () => {
   }, []);
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step < 4) {
       setStep((prev) => (prev + 1) as Step);
     }
   };
@@ -45,10 +46,11 @@ export const WelcomeDialog = () => {
     localStorage.setItem("userDisplayName", displayName);
     localStorage.setItem("writingFrequency", writingFrequency);
     localStorage.setItem("promptStyle", promptStyle);
+    localStorage.setItem("visualStyle", visualStyle);
     setOpen(false);
   };
 
-  const progress = (step / 3) * 100;
+  const progress = (step / 4) * 100;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -56,11 +58,12 @@ export const WelcomeDialog = () => {
         <DialogHeader>
           <div className="flex items-center justify-between mb-2">
             <DialogTitle className="text-xl">
-              {step === 1 && "Welcome to Muze"}
-              {step === 2 && "Your Writing Rhythm"}
-              {step === 3 && "Prompt Style"}
+              {step === 1 && "Let's get to know you"}
+              {step === 2 && "How do you like to write?"}
+              {step === 3 && "What helps you think?"}
+              {step === 4 && "How do you see yourself?"}
             </DialogTitle>
-            <span className="text-sm text-muted-foreground">Step {step} of 3</span>
+            <span className="text-sm text-muted-foreground">Step {step} of 4</span>
           </div>
           <Progress value={progress} className="h-1" />
         </DialogHeader>
@@ -70,9 +73,9 @@ export const WelcomeDialog = () => {
           {step === 1 && (
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
-                <UserCircleIcon className="w-8 h-8 text-primary" />
+                <User className="w-8 h-8 text-primary" />
                 <DialogDescription className="text-base m-0">
-                  Let's start with what we should call you
+                  What should we call you?
                 </DialogDescription>
               </div>
               
@@ -82,11 +85,11 @@ export const WelcomeDialog = () => {
                   id="displayName"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="How should we address you?"
+                  placeholder="Your name here"
                   className="bg-input border-border"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Just for personalization – nobody else will see this
+                  Makes everything feel more personal
                 </p>
               </div>
             </div>
@@ -96,9 +99,9 @@ export const WelcomeDialog = () => {
           {step === 2 && (
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
-                <ClockIcon className="w-8 h-8 text-primary" />
+                <Clock className="w-8 h-8 text-primary" />
                 <DialogDescription className="text-base m-0">
-                  How often do you want to write?
+                  How often will you write?
                 </DialogDescription>
               </div>
 
@@ -107,24 +110,24 @@ export const WelcomeDialog = () => {
                   <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
                     <RadioGroupItem value="daily" id="daily" />
                     <Label htmlFor="daily" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Daily</div>
-                      <div className="text-sm text-muted-foreground">Write something every day</div>
+                      <div className="font-medium">Every day</div>
+                      <div className="text-sm text-muted-foreground">Build the habit, one day at a time</div>
                     </Label>
                   </div>
 
                   <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
                     <RadioGroupItem value="few-times-week" id="few-times-week" />
                     <Label htmlFor="few-times-week" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Few times a week</div>
-                      <div className="text-sm text-muted-foreground">Write when the mood strikes</div>
+                      <div className="font-medium">A few times a week</div>
+                      <div className="text-sm text-muted-foreground">Regular check-ins when it feels right</div>
                     </Label>
                   </div>
 
                   <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
                     <RadioGroupItem value="flexible" id="flexible" />
                     <Label htmlFor="flexible" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Flexible</div>
-                      <div className="text-sm text-muted-foreground">No pressure, just vibes</div>
+                      <div className="font-medium">When I feel like it</div>
+                      <div className="text-sm text-muted-foreground">Zero pressure, pure freedom</div>
                     </Label>
                   </div>
                 </div>
@@ -136,9 +139,9 @@ export const WelcomeDialog = () => {
           {step === 3 && (
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
-                <SparklesIcon className="w-8 h-8 text-primary" />
+                <Zap className="w-8 h-8 text-primary" />
                 <DialogDescription className="text-base m-0">
-                  What kind of prompts help you most?
+                  What gets your mind going?
                 </DialogDescription>
               </div>
 
@@ -147,24 +150,24 @@ export const WelcomeDialog = () => {
                   <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
                     <RadioGroupItem value="reflective" id="reflective" />
                     <Label htmlFor="reflective" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Reflective</div>
-                      <div className="text-sm text-muted-foreground">Deep thoughts, feelings, patterns</div>
+                      <div className="font-medium">Deep stuff</div>
+                      <div className="text-sm text-muted-foreground">Feelings, patterns, inner work</div>
                     </Label>
                   </div>
 
                   <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
                     <RadioGroupItem value="creative" id="creative" />
                     <Label htmlFor="creative" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Creative</div>
-                      <div className="text-sm text-muted-foreground">Stories, imagination, what-ifs</div>
+                      <div className="font-medium">Imaginative</div>
+                      <div className="text-sm text-muted-foreground">Stories, dreams, what-ifs</div>
                     </Label>
                   </div>
 
                   <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
                     <RadioGroupItem value="practical" id="practical" />
                     <Label htmlFor="practical" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Practical</div>
-                      <div className="text-sm text-muted-foreground">Goals, plans, day-to-day stuff</div>
+                      <div className="font-medium">Action-oriented</div>
+                      <div className="text-sm text-muted-foreground">Goals, plans, getting things done</div>
                     </Label>
                   </div>
                 </div>
@@ -184,21 +187,21 @@ export const WelcomeDialog = () => {
               </Button>
             )}
             
-            {step < 3 ? (
+            {step < 4 ? (
               <Button
                 onClick={handleNext}
                 disabled={step === 1 && !displayName.trim()}
                 className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                Continue
+                Next
               </Button>
             ) : (
               <Button
                 onClick={handleComplete}
                 className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                <CheckCircleIcon className="w-4 h-4 mr-2" />
-                All Set
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Let's Go
               </Button>
             )}
           </div>

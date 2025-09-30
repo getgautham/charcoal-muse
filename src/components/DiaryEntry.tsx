@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useEntries } from "@/hooks/useEntries";
-import { PaperAirplaneIcon, SparklesIcon, LightBulbIcon } from "@heroicons/react/24/outline";
+import { Send, Zap, Activity } from "react-feather";
 
 interface DiaryEntryProps {
   onEntryCreated: () => void;
@@ -126,7 +126,7 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
       <CardContent className="p-6">
         {showPrompt && promptText && (
           <div className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
-            <LightBulbIcon className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+            <Activity className="w-5 h-5 text-accent shrink-0 mt-0.5" />
             <p className="text-sm text-foreground/90 italic">{promptText}</p>
           </div>
         )}
@@ -150,13 +150,13 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <SparklesIcon className="w-5 h-5 animate-pulse" />
-                  Getting insights...
+                  <Zap className="w-5 h-5 animate-pulse" />
+                  Reading between the lines...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  <PaperAirplaneIcon className="w-5 h-5" />
-                  Send It
+                  <Send className="w-5 h-5" />
+                  Send
                 </span>
               )}
             </Button>
@@ -166,7 +166,7 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
             {/* Mood Badge - More Prominent */}
             {mood && (
               <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-accent/10 border border-accent/30">
-                <span className="text-base text-muted-foreground">Vibe check:</span>
+                <span className="text-base text-muted-foreground">Energy:</span>
                 <Badge className="bg-accent/20 text-accent border-accent/30 capitalize text-base px-4 py-1.5">
                   {mood}
                 </Badge>
@@ -174,11 +174,11 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
             )}
 
             {/* AI Insights - Main Focus */}
-            <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
-              <div className="flex items-start gap-3">
-                <SparklesIcon className="w-6 h-6 text-accent shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-foreground mb-3 text-lg">What I'm picking up</h4>
+              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20">
+                <div className="flex items-start gap-3">
+                  <Zap className="w-6 h-6 text-accent shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground mb-3 text-lg">What this tells me</h4>
                   <p className="text-foreground/90 text-base leading-relaxed">{aiResponse}</p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ const DiaryEntry = ({ onEntryCreated }: DiaryEntryProps) => {
               onClick={handleNewEntry}
               className="w-full bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 h-12 text-base"
             >
-              Write More
+              Write Again
             </Button>
           </div>
         )}

@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { Calendar, Heart, Search } from "lucide-react";
+import { Calendar, Heart, Search } from "react-feather";
 
 interface Entry {
   id: string;
@@ -76,12 +76,12 @@ const EntryList = ({ refresh }: EntryListProps) => {
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Heart className="h-6 w-6 text-accent" />
-          Past Entries
+          Your History
         </CardTitle>
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search what you wrote..."
+            placeholder="Search your thoughts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 border-border/50 bg-background/50"
