@@ -6,7 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useEntries } from "@/hooks/useEntries";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Send } from "react-feather";
+import { Crown } from "lucide-react";
 import { EMOTION_COLORS, EmotionKey } from "@/utils/emotionColors";
 
 interface ChatMessage {
@@ -31,6 +33,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   const { toast } = useToast();
   const preferences = useUserPreferences();
   const { entries } = useEntries();
+  const { subscribed, prompts_remaining, openCheckout, refresh } = useSubscription();
 
   // Load persisted messages
   useEffect(() => {
@@ -133,6 +136,16 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
+    // Check usage limits for free users
+    if (!subscribed && prompts_remaining !== undefined && prompts_remaining <= 0) {
+      toast({
+        title: "Free limit reached",
+        description: "You've used all 30 free prompts. Upgrade to Premium for unlimited journaling!",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: 'user',
@@ -220,6 +233,12 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
         })
       ]);
 
+      // Increment usage for free users
+      if (!subscribed) {
+        await supabase.rpc('increment_prompt_usage', { p_user_id: user.id });
+        if (refresh) refresh(); // Refresh subscription status to update prompts_remaining
+      }
+
       onEntryCreated();
       loadDailyPrompt(); // Get new prompt
 
@@ -296,6 +315,26 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
       {/* Fixed Bottom Input Area */}
       <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border px-4 py-3 pb-safe">
         <div className="max-w-md mx-auto">
+          {/* Usage Warning for Free Users */}
+          {!subscribed && prompts_remaining !== undefined && prompts_remaining <= 5 && (
+            <div className="mb-2 px-3 py-2 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-between">
+              <p className="text-xs text-orange-600 dark:text-orange-400">
+                {prompts_remaining > 0 
+                  ? `${prompts_remaining} free prompts remaining`
+                  : 'Free prompts exhausted'}
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => openCheckout?.()}
+                className="h-6 text-xs gap-1"
+              >
+                <Crown className="w-3 h-3" />
+                Upgrade
+              </Button>
+            </div>
+          )}
+
           {/* Prompt Above Input */}
           {promptText && (
             <div className="mb-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
