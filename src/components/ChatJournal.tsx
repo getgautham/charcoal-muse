@@ -8,7 +8,7 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useEntries } from "@/hooks/useEntries";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Send } from "react-feather";
-import { Crown } from "lucide-react";
+import { Crown } from "lucide-react"; // Premium icon
 import { EMOTION_COLORS, EmotionKey } from "@/utils/emotionColors";
 
 interface ChatMessage {
