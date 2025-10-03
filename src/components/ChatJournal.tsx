@@ -13,11 +13,12 @@ import { EMOTION_COLORS, EmotionKey } from "@/utils/emotionColors";
 
 interface ChatMessage {
   id: string;
-  type: 'user' | 'ai' | 'prompt';
+  type: 'user' | 'ai' | 'prompt' | 'surprise';
   content: string;
   mood?: string;
   highlights?: Array<{ text: string; emotion: string }>;
   timestamp: string;
+  reflectionType?: 'quote' | 'mirror' | 'challenge' | 'echo';
 }
 
 interface ChatJournalProps {
@@ -197,6 +198,24 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
       const detectedMood = moodResponse.data.result.trim().toLowerCase();
       const insights = insightsResponse.data.result;
 
+      // Check for surprise reflection (memory system)
+      const memoryResponse = await supabase.functions.invoke('memory-assistant', {
+        body: {
+          action: 'generate_surprise',
+          content: currentInput,
+          userId: user.id,
+        },
+      });
+
+      // Update user traits in background (no await)
+      supabase.functions.invoke('memory-assistant', {
+        body: {
+          action: 'update_traits',
+          content: currentInput,
+          userId: user.id,
+        },
+      });
+
       // Add AI response with highlighted user message
       const highlights = highlightEmotions(currentInput, detectedMood);
       setMessages(prev => prev.map(msg => 
@@ -214,6 +233,21 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
       };
 
       setMessages(prev => [...prev, aiMessage]);
+
+      // Add surprise reflection if available
+      if (memoryResponse?.data?.hasSurprise && memoryResponse?.data?.surprise) {
+        const surpriseMessage: ChatMessage = {
+          id: (Date.now() + 2).toString(),
+          type: 'surprise',
+          content: memoryResponse.data.surprise.content,
+          timestamp: new Date().toISOString(),
+          reflectionType: memoryResponse.data.surprise.reflection_type,
+        };
+        
+        setTimeout(() => {
+          setMessages(prev => [...prev, surpriseMessage]);
+        }, 1500);
+      }
 
       // Save messages to chat_messages table
       await Promise.all([
@@ -298,15 +332,31 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${
+              message.type === 'user' 
+                ? 'justify-end' 
+                : message.type === 'surprise'
+                ? 'justify-center'
+                : 'justify-start'
+            }`}
           >
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                 message.type === 'user'
                   ? 'bg-primary text-white'
+                  : message.type === 'surprise'
+                  ? 'bg-gradient-to-r from-accent/20 to-primary/10 border-2 border-accent/40'
                   : 'bg-card border border-border text-[#333333]'
               }`}
             >
+              {message.type === 'surprise' && message.reflectionType && (
+                <div className="text-xs font-semibold uppercase tracking-wider mb-2 text-primary/80">
+                  {message.reflectionType === 'quote' && '✨ Wisdom'}
+                  {message.reflectionType === 'mirror' && '🪞 Reflection'}
+                  {message.reflectionType === 'challenge' && '🎯 Challenge'}
+                  {message.reflectionType === 'echo' && '🔄 Echo'}
+                </div>
+              )}
               {message.highlights && message.type === 'user' ? (
                 <p className="text-sm leading-relaxed text-white">
                   {message.highlights.map((part, i) => {
@@ -347,7 +397,13 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
                   })}
                 </p>
               ) : (
-                <p className={`text-sm leading-relaxed ${message.type === 'user' ? 'text-white' : ''}`}>
+                <p className={`text-sm leading-relaxed ${
+                  message.type === 'user' 
+                    ? 'text-white' 
+                    : message.type === 'surprise'
+                    ? 'italic font-medium text-[#444]'
+                    : ''
+                }`}>
                   {message.content}
                 </p>
               )}
