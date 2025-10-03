@@ -8,47 +8,47 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 240 15% 12%;
-    --foreground: 240 8% 88%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 15%;
 
-    --card: 240 12% 16%;
-    --card-foreground: 240 8% 88%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
 
-    --popover: 240 14% 14%;
-    --popover-foreground: 240 8% 88%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
 
-    --primary: 200 25% 55%;
-    --primary-foreground: 240 15% 12%;
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 280 20% 50%;
-    --secondary-foreground: 240 8% 88%;
+    --secondary: 0 0% 45%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 10% 22%;
-    --muted-foreground: 240 6% 60%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 320 25% 55%;
-    --accent-foreground: 240 8% 88%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 40% 55%;
-    --destructive-foreground: 240 8% 88%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 24%;
-    --input: 240 12% 20%;
-    --ring: 200 25% 55%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 25 95% 53%;
 
     --radius: 0.75rem;
     
-    --shadow-card: 0 4px 20px hsla(240, 15%, 8%, 0.4);
+    --shadow-card: 0 1px 3px hsla(0, 0%, 0%, 0.12);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Ekman's 6 Core Emotions - Color System */
-    --emotion-happiness: 48 96% 53%;      /* Warm yellow */
-    --emotion-sadness: 221 83% 53%;       /* Deep blue */
-    --emotion-fear: 280 60% 50%;          /* Purple */
-    --emotion-anger: 0 72% 51%;           /* Red */
-    --emotion-surprise: 168 76% 42%;      /* Teal */
-    --emotion-disgust: 88 50% 53%;        /* Olive green */
+    --emotion-happiness: 48 96% 53%;
+    --emotion-sadness: 221 83% 53%;
+    --emotion-fear: 280 60% 50%;
+    --emotion-anger: 0 72% 51%;
+    --emotion-surprise: 168 76% 42%;
+    --emotion-disgust: 88 50% 53%;
   }
 
   .dark {

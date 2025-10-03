@@ -72,17 +72,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <WelcomeDialog />
-      
-      {/* Top Navigation with Tabs */}
-      <TopNav
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onDiceClick={handleDiceClick}
-        onPresetsClick={handlePresetsClick}
-      />
 
       {/* Main Content Area */}
-      <div className="pt-14 h-screen overflow-hidden">
+      <div className="h-screen overflow-hidden pb-16">
         <div className="max-w-md mx-auto h-full">
           {activeTab === 'chat' ? (
             <div className="h-full">
@@ -95,6 +87,14 @@ const Index = () => {
           )}
         </div>
       </div>
+      
+      {/* Bottom Navigation with Tabs */}
+      <TopNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onDiceClick={handleDiceClick}
+        onPresetsClick={handlePresetsClick}
+      />
     </div>
   );
 };
