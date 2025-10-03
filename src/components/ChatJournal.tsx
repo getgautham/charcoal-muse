@@ -198,23 +198,25 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
       const detectedMood = moodResponse.data.result.trim().toLowerCase();
       const insights = insightsResponse.data.result;
 
-      // Check for surprise reflection (memory system)
-      const memoryResponse = await supabase.functions.invoke('memory-assistant', {
+      // Kick off surprise check in background (don't block chat)
+      const memoryPromise = supabase.functions.invoke('memory-assistant', {
         body: {
           action: 'generate_surprise',
           content: currentInput,
           userId: user.id,
+          recentMessages: messages.slice(-5).map(m => ({ content: m.content, type: m.type })),
         },
       });
 
-      // Update user traits in background (no await)
-      supabase.functions.invoke('memory-assistant', {
-        body: {
-          action: 'update_traits',
-          content: currentInput,
-          userId: user.id,
-        },
-      });
+      // Fire and forget: batch memory update every 5 entries
+      if (entries.length > 0 && entries.length % 5 === 0) {
+        supabase.functions.invoke('memory-assistant', {
+          body: {
+            action: 'batch_update_memory',
+            userId: user.id,
+          },
+        }).catch(e => console.log('[Memory] Background update queued'));
+      }
 
       // Add AI response with highlighted user message
       const highlights = highlightEmotions(currentInput, detectedMood);
@@ -234,20 +236,24 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
 
       setMessages(prev => [...prev, aiMessage]);
 
-      // Add surprise reflection if available
-      if (memoryResponse?.data?.hasSurprise && memoryResponse?.data?.surprise) {
-        const surpriseMessage: ChatMessage = {
-          id: (Date.now() + 2).toString(),
-          type: 'surprise',
-          content: memoryResponse.data.surprise.content,
-          timestamp: new Date().toISOString(),
-          reflectionType: memoryResponse.data.surprise.reflection_type,
-        };
-        
-        setTimeout(() => {
-          setMessages(prev => [...prev, surpriseMessage]);
-        }, 1500);
-      }
+      // Process surprise in background without blocking
+      memoryPromise.then((memoryResponse) => {
+        if (memoryResponse?.data?.hasSurprise && memoryResponse?.data?.surprise) {
+          const surpriseMessage: ChatMessage = {
+            id: (Date.now() + 2).toString(),
+            type: 'surprise',
+            content: memoryResponse.data.surprise.content,
+            timestamp: new Date().toISOString(),
+            reflectionType: memoryResponse.data.surprise.reflection_type,
+          };
+          
+          // Delay surprise appearance for better UX
+          setTimeout(() => {
+            setMessages(prev => [...prev, surpriseMessage]);
+          }, 2000);
+        }
+      }).catch(e => console.log('[Memory] Surprise check failed'));
+      
 
       // Save messages to chat_messages table
       await Promise.all([
