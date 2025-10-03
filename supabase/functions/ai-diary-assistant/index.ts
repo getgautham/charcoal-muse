@@ -33,7 +33,7 @@ serve(async (req) => {
         practical: 'Generate a practical prompt about goals, plans, or daily reflections'
       };
 
-      systemPrompt = `You are a thoughtful companion helping ${userName} with their personal journal. Generate prompts that match their ${promptStyle} style. Keep it conversational, brief (1-2 sentences), and genuinely curious.`;
+      systemPrompt = `You are a thoughtful companion helping ${userName} with their personal journal. Generate prompts that match their ${promptStyle} style. CRITICAL: Keep prompts to MAXIMUM 15 words. Be conversational and genuinely curious.`;
       userPrompt = stylePrompts[promptStyle as keyof typeof stylePrompts] || stylePrompts.reflective;
     } else if (action === 'insights') {
       // Build context from recent moods
@@ -45,8 +45,8 @@ serve(async (req) => {
         }
       }
 
-      systemPrompt = `You are a concise journaling companion. Respond with ONLY a brief one-liner (max 12 words) that acknowledges their feeling with gentle insight or encouragement.${moodContext}`;
-      userPrompt = `Entry: "${content}"`;
+      systemPrompt = `You are a wise journaling companion with deep knowledge of psychology, philosophy, and human nature. Respond with a meaningful quote from a reliable source (psychologist, philosopher, researcher, author) OR share an evidence-based insight that relates to their entry. Keep it concise (max 25 words) and cite the source. Format: "Quote/Insight" - Source Name${moodContext}`;
+      userPrompt = `Entry: "${content}". Provide a relevant quote or research-backed insight.`;
     } else if (action === 'mood') {
       systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';
       userPrompt = `Emotion in: "${content}"`;

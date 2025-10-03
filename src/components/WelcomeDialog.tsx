@@ -175,6 +175,46 @@ export const WelcomeDialog = () => {
             </div>
           )}
 
+          {/* Step 4: Visual Style */}
+          {step === 4 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 mb-4">
+                <BarChart2 className="w-8 h-8 text-primary" />
+                <DialogDescription className="text-base m-0">
+                  How do you like to see your progress?
+                </DialogDescription>
+              </div>
+
+              <RadioGroup value={visualStyle} onValueChange={setVisualStyle}>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
+                    <RadioGroupItem value="detailed" id="detailed" />
+                    <Label htmlFor="detailed" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Show me everything</div>
+                      <div className="text-sm text-muted-foreground">Charts, stats, all the data</div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
+                    <RadioGroupItem value="minimal" id="minimal" />
+                    <Label htmlFor="minimal" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Keep it simple</div>
+                      <div className="text-sm text-muted-foreground">Just the highlights, no clutter</div>
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3 p-4 rounded-lg border border-border bg-input/50 hover:bg-input cursor-pointer">
+                    <RadioGroupItem value="hidden" id="hidden" />
+                    <Label htmlFor="hidden" className="flex-1 cursor-pointer">
+                      <div className="font-medium">Focus on writing</div>
+                      <div className="text-sm text-muted-foreground">Hide analytics, just journal</div>
+                    </Label>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex gap-3 pt-2">
             {step > 1 && (
