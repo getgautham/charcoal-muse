@@ -45,15 +45,15 @@ serve(async (req) => {
         }
       }
 
-      systemPrompt = `You are a wise journaling companion with deep knowledge of psychology, philosophy, and human nature. Respond with a meaningful quote from a reliable source (psychologist, philosopher, researcher, author) OR share an evidence-based insight that relates to their entry. Keep it concise (max 25 words) and cite the source. Format: "Quote/Insight" - Source Name${moodContext}`;
-      userPrompt = `Entry: "${content}". Provide a relevant quote or research-backed insight.`;
+      systemPrompt = `You are a personal data analyst for ${userName}'s journal. Analyze their entry objectively and provide factual feedback based on patterns, word frequency, or sentiment shifts. Be neutral and evidence-based. No motivational language or therapy speak. Format: "[Observation]" or "[Data point]"${moodContext}`;
+      userPrompt = `Entry: "${content}". Analyze objectively and provide one measurable insight.`;
     } else if (action === 'mood') {
       systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';
       userPrompt = `Emotion in: "${content}"`;
     } else if (action === 'growth') {
-      // New growth insights based on patterns
-      systemPrompt = `You are a personal growth AI analyzing ${userName}'s emotional patterns over time. Using Ekman's model, identify growth opportunities, emotional patterns, and actionable insights. Be specific, compassionate, and focused on self-improvement.`;
-      userPrompt = `Analyze these emotional patterns: ${JSON.stringify(recentEntries)}. What growth insights can you offer?`;
+      // Pattern analysis based on data
+      systemPrompt = `You are a data analyst tracking ${userName}'s emotional patterns. Report trends, frequency shifts, and measurable changes. Be factual and specific. Use numbers, percentages, and timespans. No emotional language or advice—just observations from their data.`;
+      userPrompt = `Analyze these patterns: ${JSON.stringify(recentEntries)}. Report measurable trends.`;
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

@@ -40,10 +40,10 @@ serve(async (req) => {
         .limit(3);
 
       // Build lightweight context
-      let systemPrompt = 'You are a thoughtful journaling assistant.';
+      let systemPrompt = 'You are a personal data analyst providing objective insights.';
       
       if (traits?.themes && traits.themes.length > 0) {
-        systemPrompt += ` User's recurring themes: ${traits.themes.slice(0, 3).join(', ')}.`;
+        systemPrompt += ` Tracked patterns: ${traits.themes.slice(0, 3).join(', ')}.`;
       }
       // Only generate surprise 30% of the time (not every message)
       if (Math.random() < 0.30) {
@@ -57,15 +57,15 @@ serve(async (req) => {
         let surprisePrompt = '';
         
         if (surpriseType === 'quote') {
-          surprisePrompt = 'Generate a brief inspiring quote (with author) that relates to their reflection. Keep it under 40 words.';
+          surprisePrompt = 'Provide a research-backed fact or data point related to their entry. Include source. Format: "[Fact/statistic]" - Source. Under 35 words.';
         } else if (surpriseType === 'mirror') {
-          surprisePrompt = 'Create a gentle one-line observation. Start with "I notice..." Keep it under 30 words.';
+          surprisePrompt = `Count word frequency or identify pattern. Example: "The word 'X' appears Y times." Be factual. Under 25 words.`;
         } else if (surpriseType === 'challenge') {
-          surprisePrompt = 'Offer a tiny micro-challenge. Start with "Try this:" Keep it under 25 words.';
+          surprisePrompt = 'Suggest a measurable tracking experiment. Format: "Track: [specific metric]." Under 20 words.';
         } else if (surpriseType === 'echo' && recentEntries && recentEntries.length > 0) {
           const oldEntry = recentEntries[Math.floor(Math.random() * recentEntries.length)];
           const daysAgo = Math.floor((Date.now() - new Date(oldEntry.created_at).getTime()) / (1000 * 60 * 60 * 24));
-          surprisePrompt = `${daysAgo} days ago you wrote: "${oldEntry.content.substring(0, 60)}..." Compare to today's reflection. Keep under 40 words.`;
+          surprisePrompt = `${daysAgo} days ago: "${oldEntry.content.substring(0, 50)}..." vs today. Identify language shift or pattern change. Be specific. Under 35 words.`;
         }
 
         const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
