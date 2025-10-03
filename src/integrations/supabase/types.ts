@@ -135,6 +135,7 @@ export type Database = {
           created_at: string | null
           entry_count: number | null
           id: string
+          processed: boolean | null
           summary: string
           user_id: string
         }
@@ -142,6 +143,7 @@ export type Database = {
           created_at?: string | null
           entry_count?: number | null
           id?: string
+          processed?: boolean | null
           summary: string
           user_id: string
         }
@@ -149,6 +151,7 @@ export type Database = {
           created_at?: string | null
           entry_count?: number | null
           id?: string
+          processed?: boolean | null
           summary?: string
           user_id?: string
         }
