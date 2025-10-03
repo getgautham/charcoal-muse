@@ -74,8 +74,8 @@ const Index = () => {
       <WelcomeDialog />
 
       {/* Main Content Area */}
-      <div className="h-screen overflow-hidden pb-16">
-        <div className="max-w-md mx-auto h-full">
+      <div className="h-screen overflow-hidden pb-16 max-w-6xl mx-auto">
+        <div className="h-full">
           {activeTab === 'chat' ? (
             <div className="h-full">
               <ChatJournal onEntryCreated={handleEntryCreated} />

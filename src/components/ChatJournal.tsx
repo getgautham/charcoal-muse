@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -29,6 +29,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   const [input, setInput] = useState("");
   const [promptText, setPromptText] = useState("");
   const [loading, setLoading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const preferences = useUserPreferences();
@@ -44,6 +45,14 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [input]);
 
   const loadMessages = async () => {
     try {
@@ -254,7 +263,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full max-w-3xl mx-auto">
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-4">
         {messages.map((message) => (
@@ -314,7 +323,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
 
       {/* Fixed Bottom Input Area - Above Bottom Nav */}
       <div className="bg-background border-t border-border px-4 py-3 pb-20">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Usage Warning for Free Users */}
           {!subscribed && prompts_remaining !== undefined && prompts_remaining <= 5 && (
             <div className="mb-2 px-3 py-2 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-between">
@@ -343,14 +352,21 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
           )}
 
           {/* Input Bar */}
-          <div className="flex gap-2 items-center">
-            <Input
+          <div className="flex gap-2 items-end">
+            <Textarea
+              ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
               placeholder="What's on your mind?"
-              className="flex-1 bg-white border-[#d1d1d1] text-[#333333] placeholder:text-[#666666] text-sm h-12 rounded-full"
+              className="flex-1 bg-white border-[#d1d1d1] text-[#333333] placeholder:text-[#666666] text-sm min-h-[48px] max-h-[200px] rounded-2xl resize-none py-3"
               disabled={loading}
+              rows={1}
             />
             <Button
               onClick={handleSend}

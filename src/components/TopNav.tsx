@@ -39,7 +39,7 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border/50 pb-safe">
-      <div className="max-w-md mx-auto px-4 py-3">
+      <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Left: Presets Button */}
           <Sheet open={presetsOpen} onOpenChange={setPresetsOpen}>

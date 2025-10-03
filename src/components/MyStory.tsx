@@ -79,7 +79,7 @@ export const MyStory = ({ entries }: MyStoryProps) => {
   const dominantMoodColor = EMOTION_COLORS[stats.dominantMood as EmotionKey];
 
   return (
-    <div className="space-y-6 pb-6">
+    <div className="space-y-6 pb-6 max-w-4xl mx-auto px-4">
       {/* Simplified Large Key Stats */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
