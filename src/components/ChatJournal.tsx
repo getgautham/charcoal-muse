@@ -7,8 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useEntries } from "@/hooks/useEntries";
 import { useSubscription } from "@/hooks/useSubscription";
-import { Send } from "react-feather";
-import { Crown } from "lucide-react"; // Premium icon
+import { Send, Trash2, BarChart2 } from "react-feather";
+import { Crown, Lightbulb } from "lucide-react"; // Premium icon
 import { EMOTION_COLORS, EmotionKey } from "@/utils/emotionColors";
 
 interface ChatMessage {
@@ -262,6 +262,35 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
     }
   };
 
+  const clearChat = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      await supabase.from('chat_messages').delete().eq('user_id', user.id);
+      setMessages([]);
+      toast({ title: "Chat cleared", description: "All messages have been removed." });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  };
+
+  const getSummary = async () => {
+    if (messages.length === 0) {
+      toast({ title: "No messages", description: "Start chatting to get a summary!" });
+      return;
+    }
+    toast({ title: "Summary", description: "Summary feature coming soon!" });
+  };
+
+  const getInsights = async () => {
+    if (messages.length === 0) {
+      toast({ title: "No messages", description: "Start chatting to get insights!" });
+      return;
+    }
+    toast({ title: "Insights", description: "Insights feature coming soon!" });
+  };
+
   return (
     <div className="flex flex-col h-full max-w-3xl mx-auto">
       {/* Chat Messages */}
@@ -278,7 +307,26 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
                   : 'bg-card border border-border text-[#333333]'
               }`}
             >
-              {message.highlights ? (
+              {message.highlights && message.type === 'user' ? (
+                <p className="text-sm leading-relaxed text-white">
+                  {message.highlights.map((part, i) => {
+                    const emotionColor = EMOTION_COLORS[part.emotion as EmotionKey];
+                    return (
+                      <span
+                        key={i}
+                        style={{
+                          backgroundColor: emotionColor?.bg || 'transparent',
+                          padding: emotionColor ? '0.125rem 0.25rem' : '0',
+                          borderRadius: '0.25rem',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {part.text}
+                      </span>
+                    );
+                  })}
+                </p>
+              ) : message.highlights ? (
                 <p className="text-sm leading-relaxed">
                   {message.highlights.map((part, i) => {
                     const emotionColor = EMOTION_COLORS[part.emotion as EmotionKey];
@@ -299,7 +347,9 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
                   })}
                 </p>
               ) : (
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                <p className={`text-sm leading-relaxed ${message.type === 'user' ? 'text-white' : ''}`}>
+                  {message.content}
+                </p>
               )}
               {message.mood && message.type === 'ai' && (
                 <div className="mt-2 flex items-center gap-2">
@@ -353,21 +403,53 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
 
           {/* Input Bar */}
           <div className="flex gap-2 items-end">
-            <Textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="What's on your mind?"
-              className="flex-1 bg-white border-[#d1d1d1] text-[#333333] placeholder:text-[#666666] text-sm min-h-[48px] max-h-[200px] rounded-2xl resize-none py-3"
-              disabled={loading}
-              rows={1}
-            />
+            <div className="flex-1">
+              <Textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="What's on your mind?"
+                className="bg-white border-[#d1d1d1] text-[#333333] placeholder:text-[#666666] text-sm min-h-[48px] max-h-[200px] rounded-2xl resize-none py-3 mb-2"
+                disabled={loading}
+                rows={1}
+              />
+              {/* Action Buttons */}
+              <div className="flex gap-2 items-center justify-start">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearChat}
+                  className="h-8 gap-1.5 text-xs text-[#666666] hover:text-[#333333] hover:bg-muted/50"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Clear
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={getSummary}
+                  className="h-8 gap-1.5 text-xs text-[#666666] hover:text-[#333333] hover:bg-muted/50"
+                >
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  Summary
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={getInsights}
+                  className="h-8 gap-1.5 text-xs text-[#666666] hover:text-[#333333] hover:bg-muted/50"
+                >
+                  <BarChart2 className="w-3.5 h-3.5" />
+                  Insights
+                </Button>
+              </div>
+            </div>
             <Button
               onClick={handleSend}
               disabled={loading || !input.trim()}
