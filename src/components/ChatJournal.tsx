@@ -266,7 +266,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
               className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                 message.type === 'user'
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-card border border-border'
+                  : 'bg-card border border-border text-[#333333]'
               }`}
             >
               {message.highlights ? (
