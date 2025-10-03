@@ -256,7 +256,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   return (
     <div className="flex flex-col h-full">
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-32">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-4">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -265,7 +265,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                 message.type === 'user'
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-white'
                   : 'bg-card border border-border text-[#333333]'
               }`}
             >
@@ -312,13 +312,13 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Fixed Bottom Input Area */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border px-4 py-3 pb-safe">
+      {/* Fixed Bottom Input Area - Above Bottom Nav */}
+      <div className="bg-background border-t border-border px-4 py-3 pb-20">
         <div className="max-w-md mx-auto">
           {/* Usage Warning for Free Users */}
           {!subscribed && prompts_remaining !== undefined && prompts_remaining <= 5 && (
             <div className="mb-2 px-3 py-2 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-between">
-              <p className="text-xs text-orange-600 dark:text-orange-400">
+              <p className="text-xs text-orange-700 font-medium">
                 {prompts_remaining > 0 
                   ? `${prompts_remaining} free prompts remaining`
                   : 'Free prompts exhausted'}
@@ -327,7 +327,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
                 size="sm"
                 variant="outline"
                 onClick={() => openCheckout?.()}
-                className="h-6 text-xs gap-1"
+                className="h-6 text-xs gap-1 border-orange-600 text-orange-700 hover:bg-orange-50"
               >
                 <Crown className="w-3 h-3" />
                 Upgrade
@@ -337,8 +337,8 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
 
           {/* Prompt Above Input */}
           {promptText && (
-            <div className="mb-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
-              <p className="text-xs text-foreground/70 italic">{promptText}</p>
+            <div className="mb-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20">
+              <p className="text-xs text-[#333333] italic">{promptText}</p>
             </div>
           )}
 
@@ -349,14 +349,14 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               placeholder="What's on your mind?"
-              className="flex-1 bg-input border-border/50 text-sm h-10 rounded-full"
+              className="flex-1 bg-white border-[#d1d1d1] text-[#333333] placeholder:text-[#666666] text-sm h-12 rounded-full"
               disabled={loading}
             />
             <Button
               onClick={handleSend}
               disabled={loading || !input.trim()}
               size="icon"
-              className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 shrink-0"
+              className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 shrink-0"
             >
               <Send className="w-4 h-4" />
             </Button>

@@ -85,8 +85,8 @@ export const MyStory = ({ entries }: MyStoryProps) => {
         <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
           <div className="flex flex-col">
             <Calendar className="w-7 h-7 text-primary mb-3" />
-            <div className="text-5xl font-bold text-foreground mb-1">{stats.streak}</div>
-            <div className="text-sm text-muted-foreground">Day Streak</div>
+            <div className="text-5xl font-bold text-[#333333] mb-1">{stats.streak}</div>
+            <div className="text-sm text-[#666666]">Day Streak</div>
           </div>
         </Card>
         
@@ -96,19 +96,19 @@ export const MyStory = ({ entries }: MyStoryProps) => {
               className="w-7 h-7 rounded-full mb-3"
               style={{ backgroundColor: dominantMoodColor?.text }}
             />
-            <div className="text-xl font-bold text-foreground capitalize mb-1">
+            <div className="text-xl font-bold text-[#333333] capitalize mb-1">
               {dominantMoodColor?.label || stats.dominantMood}
             </div>
-            <div className="text-sm text-muted-foreground">Your Vibe</div>
+            <div className="text-sm text-[#666666]">Your Vibe</div>
           </div>
         </Card>
       </div>
 
       {/* Large 30-Day Activity Grid */}
-      <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
+      <Card className="p-6 bg-card border-border">
         <div className="flex items-center gap-2 mb-5">
           <Calendar className="w-5 h-5 text-primary" />
-          <h3 className="text-base font-semibold">Last 30 Days</h3>
+          <h3 className="text-lg font-bold text-[#333333]">Last 30 Days</h3>
         </div>
         <div className="grid grid-cols-10 gap-2">
           {stats.timelineData.map((day, i) => {
@@ -129,16 +129,16 @@ export const MyStory = ({ entries }: MyStoryProps) => {
       </Card>
 
       {/* Recent Moments - Larger Cards */}
-      <Card className="p-6 bg-card/50 backdrop-blur-sm border-border/50">
+      <Card className="p-6 bg-card border-border">
         <div className="flex items-center gap-2 mb-5">
           <Sun className="w-5 h-5 text-primary" />
-          <h3 className="text-base font-semibold">Recent Moments</h3>
+          <h3 className="text-lg font-bold text-[#333333]">Recent Moments</h3>
         </div>
         <div className="space-y-4">
           {entries.slice(0, 5).map(entry => {
             const emotionColor = entry.mood ? EMOTION_COLORS[entry.mood.toLowerCase() as EmotionKey] : null;
             return (
-              <div key={entry.id} className="p-5 rounded-xl bg-background/60 border border-border/50">
+              <div key={entry.id} className="p-5 rounded-xl bg-white border border-[#d1d1d1]">
                 <div className="flex items-start gap-3 mb-2">
                   {emotionColor && (
                     <div 
@@ -146,16 +146,16 @@ export const MyStory = ({ entries }: MyStoryProps) => {
                       style={{ backgroundColor: emotionColor.text }}
                     />
                   )}
-                  <p className="text-sm text-foreground/90 line-clamp-3 flex-1 leading-relaxed">
+                  <p className="text-sm text-[#333333] line-clamp-3 flex-1 leading-relaxed">
                     {entry.content}
                   </p>
                 </div>
                 {entry.ai_insights && (
-                  <p className="text-xs text-muted-foreground/80 italic ml-6 mb-2">
+                  <p className="text-xs text-[#666666] italic ml-6 mb-2">
                     "{entry.ai_insights}"
                   </p>
                 )}
-                <div className="text-xs text-muted-foreground ml-6">
+                <div className="text-xs text-[#666666] ml-6">
                   {new Date(entry.created_at).toLocaleDateString('en-US', { 
                     month: 'long', 
                     day: 'numeric',
