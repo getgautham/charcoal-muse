@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEntries } from "@/hooks/useEntries";
 import { ChatJournal } from "@/components/ChatJournal";
 import { MyStory } from "@/components/MyStory";
+import { GoalsManager } from "@/components/GoalsManager";
 import { TopNav } from "@/components/TopNav";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { LogOut, Sun } from "react-feather";
@@ -14,7 +15,7 @@ import { Session } from "@supabase/supabase-js";
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activeTab, setActiveTab] = useState<'chat' | 'story'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'story' | 'goals'>('chat');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { entries } = useEntries(refreshKey);
@@ -79,6 +80,10 @@ const Index = () => {
           {activeTab === 'chat' ? (
             <div className="h-full">
               <ChatJournal onEntryCreated={handleEntryCreated} />
+            </div>
+          ) : activeTab === 'goals' ? (
+            <div className="h-full overflow-y-auto px-4 py-4">
+              <GoalsManager />
             </div>
           ) : (
             <div className="h-full overflow-y-auto px-4 py-4">

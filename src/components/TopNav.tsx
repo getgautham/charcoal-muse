@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, TrendingUp, RefreshCw, Star } from "react-feather";
+import { MessageCircle, TrendingUp, RefreshCw, Star, Target } from "react-feather";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/sheet";
 
 interface TopNavProps {
-  activeTab: 'chat' | 'story';
-  onTabChange: (tab: 'chat' | 'story') => void;
+  activeTab: 'chat' | 'story' | 'goals';
+  onTabChange: (tab: 'chat' | 'story' | 'goals') => void;
   onDiceClick: () => void;
   onPresetsClick: () => void;
 }
@@ -83,6 +83,17 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
               >
                 <MessageCircle className="w-4 h-4 inline mr-1.5" />
                 Chat
+              </button>
+              <button
+                onClick={() => onTabChange('goals')}
+                className={`px-6 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  activeTab === 'goals'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Target className="w-4 h-4 inline mr-1.5" />
+                Goals
               </button>
               <button
                 onClick={() => onTabChange('story')}

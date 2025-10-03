@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useEntries } from "@/hooks/useEntries";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useUserGoals } from "@/hooks/useUserGoals";
 import { Send, Trash2, BarChart2 } from "react-feather";
 import { Crown, Lightbulb } from "lucide-react"; // Premium icon
 import { EMOTION_COLORS, EmotionKey } from "@/utils/emotionColors";
@@ -36,6 +37,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
   const preferences = useUserPreferences();
   const { entries } = useEntries();
   const { subscribed, prompts_remaining, openCheckout, refresh } = useSubscription();
+  const { goals } = useUserGoals();
 
   // Load persisted messages
   useEffect(() => {
@@ -177,6 +179,11 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
         created_at: e.created_at
       }));
 
+      const userGoals = goals.map(g => ({
+        goal_text: g.goal_text,
+        category: g.category
+      }));
+
       // Get mood and insights
       const [moodResponse, insightsResponse] = await Promise.all([
         supabase.functions.invoke('ai-diary-assistant', {
@@ -187,7 +194,8 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
             action: 'insights', 
             content: currentInput,
             preferences,
-            recentEntries 
+            recentEntries,
+            userGoals
           }
         })
       ]);

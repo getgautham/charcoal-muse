@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, content, mood, preferences, recentEntries } = await req.json();
+    const { action, content, mood, preferences, recentEntries, userGoals } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -26,6 +26,12 @@ serve(async (req) => {
     const userName = preferences?.displayName || 'friend';
     const promptStyle = preferences?.promptStyle || 'reflective';
 
+    // Build goal context if available
+    let goalContext = '';
+    if (userGoals && userGoals.length > 0) {
+      goalContext = ` Active goals: ${userGoals.map((g: any) => g.goal_text).join(', ')}.`;
+    }
+
     if (action === 'prompt') {
       const stylePrompts = {
         reflective: 'Generate a thought-provoking prompt about self-discovery, emotions, or life patterns',
@@ -33,7 +39,7 @@ serve(async (req) => {
         practical: 'Generate a practical prompt about goals, plans, or daily reflections'
       };
 
-      systemPrompt = `You are a thoughtful companion helping ${userName} with their personal journal. Generate prompts that match their ${promptStyle} style. CRITICAL: Keep prompts to MAXIMUM 15 words. Be conversational and genuinely curious.`;
+      systemPrompt = `You are a thoughtful companion helping ${userName} with their personal journal. Generate prompts that match their ${promptStyle} style. CRITICAL: Keep prompts to MAXIMUM 15 words. Be conversational and genuinely curious.${goalContext}`;
       userPrompt = stylePrompts[promptStyle as keyof typeof stylePrompts] || stylePrompts.reflective;
     } else if (action === 'insights') {
       // Build context from recent moods
@@ -45,15 +51,19 @@ serve(async (req) => {
         }
       }
 
-      systemPrompt = `You are a personal data analyst for ${userName}'s journal. Analyze their entry objectively and provide factual feedback based on patterns, word frequency, or sentiment shifts. Be neutral and evidence-based. No motivational language or therapy speak. Format: "[Observation]" or "[Data point]"${moodContext}`;
-      userPrompt = `Entry: "${content}". Analyze objectively and provide one measurable insight.`;
+      systemPrompt = `You are a personal data analyst for ${userName}'s journal. Analyze their entry objectively and provide factual feedback based on patterns, word frequency, or sentiment shifts. Be neutral and evidence-based. No motivational language or therapy speak. Format: "[Observation]" or "[Data point]"${moodContext}${goalContext}`;
+      userPrompt = `Entry: "${content}". Analyze objectively and provide one measurable insight.${userGoals && userGoals.length > 0 ? ' If relevant to their goals, mention connection briefly.' : ''}`;
     } else if (action === 'mood') {
       systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';
       userPrompt = `Emotion in: "${content}"`;
     } else if (action === 'growth') {
       // Pattern analysis based on data
-      systemPrompt = `You are a data analyst tracking ${userName}'s emotional patterns. Report trends, frequency shifts, and measurable changes. Be factual and specific. Use numbers, percentages, and timespans. No emotional language or advice—just observations from their data.`;
-      userPrompt = `Analyze these patterns: ${JSON.stringify(recentEntries)}. Report measurable trends.`;
+      systemPrompt = `You are a data analyst tracking ${userName}'s emotional patterns. Report trends, frequency shifts, and measurable changes. Be factual and specific. Use numbers, percentages, and timespans. No emotional language or advice—just observations from their data.${goalContext}`;
+      userPrompt = `Analyze these patterns: ${JSON.stringify(recentEntries)}. Report measurable trends.${userGoals && userGoals.length > 0 ? ' Check progress toward goals if relevant.' : ''}`;
+    } else if (action === 'accountability') {
+      // Goal accountability check
+      systemPrompt = `You are a data-driven accountability coach for ${userName}. Compare their recent activity against their goals. Be factual, specific, and gentle. Use evidence from their entries. Format: "[Observation about goal progress]" or "[Question to prompt reflection]"`;
+      userPrompt = `Goals: ${JSON.stringify(userGoals)}. Recent entries: ${JSON.stringify(recentEntries)}. Provide one accountability nudge based on evidence.`;
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

@@ -187,6 +187,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_goals: {
+        Row: {
+          category: string | null
+          completed_at: string | null
+          created_at: string
+          goal_text: string
+          id: string
+          notes: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          goal_text: string
+          id?: string
+          notes?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          goal_text?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_traits: {
         Row: {
           created_at: string | null
