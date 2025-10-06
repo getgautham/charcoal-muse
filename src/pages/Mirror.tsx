@@ -51,7 +51,14 @@ export const Mirror = () => {
 
       if (analysisError) throw analysisError;
 
-      const { lens_scores, dominant_lens, sentiment, mood, insights } = analysisData.result;
+      // Parse the JSON result from the edge function
+      const analysisResult = typeof analysisData.result === 'string' 
+        ? JSON.parse(analysisData.result) 
+        : analysisData.result;
+
+      const { lens_scores, dominant_lens, sentiment, mood, insights } = analysisResult;
+
+      console.log('Analysis result:', { lens_scores, dominant_lens, sentiment, mood, insights });
 
       // Save memory - RLS will set user_id automatically via default
       const { error: memoryError } = await supabase.from('memories').insert([{
