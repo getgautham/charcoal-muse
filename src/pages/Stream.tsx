@@ -5,7 +5,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { Memory, LensScores } from "@/hooks/useEntries";
 import { LENSES } from "@/types/lens";
-import { Loader2, Waves } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface StreamData {
   date: string;
@@ -16,6 +16,7 @@ export const Stream = () => {
   const chartRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<am5.Root | null>(null);
   const [loading, setLoading] = useState(true);
+  const [memoryCount, setMemoryCount] = useState(0);
   const [weeklySummary, setWeeklySummary] = useState<string>("");
 
   useEffect(() => {
@@ -37,12 +38,13 @@ export const Stream = () => {
         .from('memories')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: true })
-        .limit(30);
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
+      setMemoryCount(data?.length || 0);
+
+      if (data && data.length >= 3) {
         const memories = data.map(m => ({
           ...m,
           lens_scores: (m.lens_scores || {}) as any as LensScores
@@ -178,6 +180,25 @@ export const Stream = () => {
     chart.appear(1000, 100);
   };
 
+  const getEmptyStateMessage = () => {
+    if (memoryCount === 0) return {
+      title: "Your story hasn't started flowing yet",
+      subtitle: "Write your first memory to begin your Stream"
+    };
+    if (memoryCount === 1) return {
+      title: "One memory captured",
+      subtitle: "Add a few more to see patterns emerge"
+    };
+    if (memoryCount === 2) return {
+      title: "Your Stream is forming",
+      subtitle: "Keep adding memories — the flow is beginning"
+    };
+    return {
+      title: "Almost there",
+      subtitle: "A few more memories and your Stream will come alive"
+    };
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3">
@@ -186,6 +207,9 @@ export const Stream = () => {
       </div>
     );
   }
+
+  const emptyState = getEmptyStateMessage();
+  const hasEnoughData = memoryCount >= 3;
 
   return (
     <div className="h-full overflow-y-auto px-6 py-6 pb-24">
@@ -202,18 +226,54 @@ export const Stream = () => {
         </div>
       )}
 
-      <div ref={chartRef} className="w-full h-[50vh] rounded-lg bg-card/30 p-2" />
+      {!hasEnoughData ? (
+        <div className="relative w-full h-[50vh] rounded-lg overflow-hidden mb-8">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 animate-pulse" />
+          
+          {/* Orbiting Lens Dots */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative w-48 h-48">
+              {LENSES.map((lens, index) => (
+                <div
+                  key={lens.id}
+                  className="absolute w-4 h-4 rounded-full"
+                  style={{
+                    backgroundColor: lens.color,
+                    opacity: 0.3,
+                    top: '50%',
+                    left: '50%',
+                    animation: `orbit 8s linear infinite`,
+                    animationDelay: `${index * 1.6}s`,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
 
-      {!weeklySummary && (
-        <div className="flex flex-col items-center justify-center py-16 gap-4">
-          <Waves className="w-16 h-16 text-muted-foreground/20" />
-          <div className="text-center space-y-2 max-w-xs">
-            <p className="text-lg font-semibold text-foreground">No stream data yet</p>
-            <p className="text-sm text-muted-foreground/60">
-              Your emotional currents will flow here as you capture more memories
-            </p>
+          {/* Empty State Message */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
+            <div className="text-center space-y-2 max-w-sm px-6">
+              <p className="text-lg font-semibold text-foreground">{emptyState.title}</p>
+              <p className="text-sm text-muted-foreground/60">{emptyState.subtitle}</p>
+            </div>
+            
+            {/* Lens Color Swatches */}
+            <div className="flex gap-2 mt-4">
+              {LENSES.map((lens) => (
+                <div
+                  key={lens.id}
+                  className="w-3 h-3 rounded-full opacity-40"
+                  style={{ backgroundColor: lens.color }}
+                  title={lens.label}
+                />
+              ))}
+            </div>
           </div>
         </div>
+      ) : (
+        <div ref={chartRef} className="w-full h-[50vh] rounded-lg bg-card/30 p-2 mb-8" />
       )}
 
       <div className="mt-8 space-y-3">

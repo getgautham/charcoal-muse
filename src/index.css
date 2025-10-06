@@ -141,4 +141,14 @@ All colors MUST be HSL.
   .input-brutal {
     @apply border-2 border-border shadow-[4px_4px_0px_hsl(var(--border))] focus:shadow-[4px_4px_0px_hsl(var(--ring))];
   }
+
+  /* Orbiting animation for Stream empty state */
+  @keyframes orbit {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg) translateX(80px) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg) translateX(80px) rotate(-360deg);
+    }
+  }
 }
