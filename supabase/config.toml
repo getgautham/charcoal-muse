@@ -14,3 +14,9 @@ verify_jwt = true
 
 [functions.memory-assistant]
 verify_jwt = false
+
+[functions.lens-insight]
+verify_jwt = true
+
+[functions.compass-direction]
+verify_jwt = true

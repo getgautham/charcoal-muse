@@ -240,6 +240,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_focus: {
+        Row: {
+          created_at: string | null
+          direction: string | null
+          expires_at: string | null
+          focus_lens: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          direction?: string | null
+          expires_at?: string | null
+          focus_lens: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          direction?: string | null
+          expires_at?: string | null
+          focus_lens?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_goals: {
         Row: {
           category: string | null
