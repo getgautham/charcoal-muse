@@ -104,7 +104,7 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
                 }`}
               >
                 <TrendingUp className="w-4 h-4 inline mr-1.5" />
-                My Story
+                Pulse
               </button>
             </div>
           </div>

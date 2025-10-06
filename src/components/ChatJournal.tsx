@@ -218,21 +218,26 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
     <div className="flex flex-col h-full">
       <MemoryFeedback 
         memoryCount={lastMemory?.count || 0}
-        mood={lastMemory?.mood}
         show={showFeedback}
       />
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-4">
-        {messages.map((message) => (
-          <div key={message.id}>
-            {message.type === 'insight' ? (
-              <MirrorInsight 
-                lensInsights={JSON.parse(message.content || '{}')}
-                timestamp={message.timestamp}
-              />
-            ) : null}
-          </div>
-        ))}
+        {messages.map((message) => {
+          if (message.type !== 'insight') return null;
+          try {
+            const insights = JSON.parse(message.content || '{}');
+            return (
+              <div key={message.id}>
+                <MirrorInsight 
+                  lensInsights={insights}
+                  timestamp={message.timestamp}
+                />
+              </div>
+            );
+          } catch {
+            return null;
+          }
+        })}
       </div>
 
       <div className="bg-background px-4 py-3 pb-20">

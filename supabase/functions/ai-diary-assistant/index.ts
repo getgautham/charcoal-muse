@@ -23,21 +23,28 @@ serve(async (req) => {
     let userPrompt = '';
 
     if (action === 'mirror') {
-      // Mirror System: Analyze through all 5 lenses
-      systemPrompt = `You are the Mirror System. Analyze this memory through exactly 5 lenses and return a JSON object with this structure:
+      // Mirror System: One-sentence insights using rhythm and reflection
+      systemPrompt = `You are the Mirror. Analyze this memory and return a JSON object:
 {
-  "love": { "detected": boolean, "signal": "brief observation about connection/people/relationships" },
-  "energy": { "detected": boolean, "signal": "brief observation about vitality/rhythm/momentum" },
-  "work": { "detected": boolean, "signal": "brief observation about creation/mastery/building" },
-  "growth": { "detected": boolean, "signal": "brief observation about learning/evolution/awareness" },
-  "satisfaction": { "detected": boolean, "signal": "brief observation about harmony/contentment/peace" }
+  "love": { "detected": boolean, "signal": "one sentence about connection/relationships" },
+  "energy": { "detected": boolean, "signal": "one sentence about vitality/momentum" },
+  "work": { "detected": boolean, "signal": "one sentence about purpose/output" },
+  "growth": { "detected": boolean, "signal": "one sentence about insight/evolution" },
+  "satisfaction": { "detected": boolean, "signal": "one sentence about peace/contentment" }
 }
 
-Guidelines:
-- Each signal must be under 15 words
-- Use mechanical language: "Pattern shows", "Memory reveals", "Data indicates"
-- Be factual and specific
-- detected=true only if lens is clearly present in the memory`;
+Format: [Trend + Category + Meaning]
+Examples:
+- "Your Energy has been rising — you sound lighter this week."
+- "Love has gone quiet lately."
+- "Work is steady, but Satisfaction hasn't caught up."
+
+Rules:
+- Maximum 12 words per signal
+- Use present tense: "sounds," "shows," "feels"
+- Grounded in what they did, not what they should do
+- Poetic but factual
+- detected=true only if clearly present`;
       userPrompt = `Memory: "${content}"`;
     } else if (action === 'mood') {
       systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';

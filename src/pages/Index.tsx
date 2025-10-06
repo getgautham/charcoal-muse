@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEntries } from "@/hooks/useEntries";
 import { ChatJournal } from "@/components/ChatJournal";
-import { MyStory } from "@/components/MyStory";
+import { LifePulse } from "@/components/LifePulse";
 import { GoalsManager } from "@/components/GoalsManager";
 import { TopNav } from "@/components/TopNav";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
@@ -87,7 +87,7 @@ const Index = () => {
             </div>
           ) : (
             <div className="h-full overflow-y-auto px-4 py-4">
-              <MyStory entries={entries} />
+              <LifePulse entries={entries} />
             </div>
           )}
         </div>
