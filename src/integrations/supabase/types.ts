@@ -50,6 +50,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          lens_insights: Json | null
           mood: string | null
           title: string | null
           updated_at: string
@@ -60,6 +61,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          lens_insights?: Json | null
           mood?: string | null
           title?: string | null
           updated_at?: string
@@ -70,6 +72,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          lens_insights?: Json | null
           mood?: string | null
           title?: string | null
           updated_at?: string

@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, content, mood, preferences, recentEntries, userGoals } = await req.json();
+    const { action, content, recentEntries, userGoals } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -22,48 +22,52 @@ serve(async (req) => {
     let systemPrompt = '';
     let userPrompt = '';
 
-    // Personalize based on user preferences
-    const userName = preferences?.displayName || 'friend';
-    const promptStyle = preferences?.promptStyle || 'reflective';
+    if (action === 'mirror') {
+      // Mirror System: Analyze through all 5 lenses
+      systemPrompt = `You are the Mirror System. Analyze this memory through exactly 5 lenses and return a JSON object with this structure:
+{
+  "love": { "detected": boolean, "signal": "brief observation about connection/people/relationships" },
+  "energy": { "detected": boolean, "signal": "brief observation about vitality/rhythm/momentum" },
+  "work": { "detected": boolean, "signal": "brief observation about creation/mastery/building" },
+  "growth": { "detected": boolean, "signal": "brief observation about learning/evolution/awareness" },
+  "satisfaction": { "detected": boolean, "signal": "brief observation about harmony/contentment/peace" }
+}
 
-    // Build goal context if available
-    let goalContext = '';
-    if (userGoals && userGoals.length > 0) {
-      goalContext = ` Active goals: ${userGoals.map((g: any) => g.goal_text).join(', ')}.`;
-    }
-
-    if (action === 'prompt') {
-      const stylePrompts = {
-        reflective: 'Generate a thought-provoking prompt about self-discovery, emotions, or life patterns',
-        creative: 'Generate an imaginative prompt that sparks creative thinking or storytelling',
-        practical: 'Generate a practical prompt about goals, plans, or daily reflections'
-      };
-
-      systemPrompt = `You are a thoughtful companion helping ${userName} with their personal journal. Generate prompts that match their ${promptStyle} style. CRITICAL: Keep prompts to MAXIMUM 15 words. Be conversational and genuinely curious.${goalContext}`;
-      userPrompt = stylePrompts[promptStyle as keyof typeof stylePrompts] || stylePrompts.reflective;
-    } else if (action === 'insights') {
-      // Build context from recent moods
-      let moodContext = '';
-      if (recentEntries && recentEntries.length > 0) {
-        const recentMoods = recentEntries.filter((e: any) => e.mood).map((e: any) => e.mood);
-        if (recentMoods.length > 0) {
-          moodContext = ` Recent pattern: ${recentMoods.slice(0, 3).join(', ')}`;
-        }
-      }
-
-      systemPrompt = `You are a personal data analyst for ${userName}'s journal. Analyze their entry objectively and provide factual feedback based on patterns, word frequency, or sentiment shifts. Be neutral and evidence-based. No motivational language or therapy speak. Format: "[Observation]" or "[Data point]"${moodContext}${goalContext}`;
-      userPrompt = `Entry: "${content}". Analyze objectively and provide one measurable insight.${userGoals && userGoals.length > 0 ? ' If relevant to their goals, mention connection briefly.' : ''}`;
+Guidelines:
+- Each signal must be under 15 words
+- Use mechanical language: "Pattern shows", "Memory reveals", "Data indicates"
+- Be factual and specific
+- detected=true only if lens is clearly present in the memory`;
+      userPrompt = `Memory: "${content}"`;
     } else if (action === 'mood') {
       systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';
       userPrompt = `Emotion in: "${content}"`;
-    } else if (action === 'growth') {
-      // Pattern analysis based on data
-      systemPrompt = `You are a data analyst tracking ${userName}'s emotional patterns. Report trends, frequency shifts, and measurable changes. Be factual and specific. Use numbers, percentages, and timespans. No emotional language or advice—just observations from their data.${goalContext}`;
-      userPrompt = `Analyze these patterns: ${JSON.stringify(recentEntries)}. Report measurable trends.${userGoals && userGoals.length > 0 ? ' Check progress toward goals if relevant.' : ''}`;
-    } else if (action === 'accountability') {
-      // Goal accountability check
-      systemPrompt = `You are a data-driven accountability coach for ${userName}. Compare their recent activity against their goals. Be factual, specific, and gentle. Use evidence from their entries. Format: "[Observation about goal progress]" or "[Question to prompt reflection]"`;
-      userPrompt = `Goals: ${JSON.stringify(userGoals)}. Recent entries: ${JSON.stringify(recentEntries)}. Provide one accountability nudge based on evidence.`;
+    } else if (action === 'lens_reflection') {
+      // Generate monthly lens-based reflection
+      const lensName = content; // 'love', 'energy', 'work', 'growth', or 'satisfaction'
+      const lensDescriptions = {
+        love: 'Connection, belonging, emotional warmth - mentions of people, affection, empathy, care',
+        energy: 'Vitality, rhythm, drive - words about rest, pace, momentum, tension, movement',
+        work: 'Purpose, creation, mastery - verbs of building, striving, finishing, frustration, focus',
+        growth: 'Evolution, learning, self-awareness - reflection language like "realized," "learned," "changed"',
+        satisfaction: 'Harmony, balance, contentment - sentiment, calm language, closure phrases'
+      };
+      
+      systemPrompt = `You are the ${lensName.toUpperCase()} Lens. Analyze these memories and generate ONE reflection (max 25 words) using mechanical language. Focus on: ${lensDescriptions[lensName as keyof typeof lensDescriptions]}. Use phrases like "Your pattern shows", "The data reveals", "Frequency indicates".`;
+      userPrompt = `Memories: ${JSON.stringify(recentEntries)}. Generate reflection.`;
+    }
+
+    const requestBody: any = {
+      model: 'google/gemini-2.5-flash',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+    };
+
+    // Use JSON mode for mirror analysis to ensure structured output
+    if (action === 'mirror') {
+      requestBody.response_format = { type: "json_object" };
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -72,13 +76,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {

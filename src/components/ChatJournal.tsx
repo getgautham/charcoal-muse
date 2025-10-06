@@ -149,26 +149,26 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
         category: g.category
       }));
 
-      const [moodResponse, insightsResponse] = await Promise.all([
+      // Get AI mood detection and lens analysis
+      const [moodResponse, lensResponse] = await Promise.all([
         supabase.functions.invoke('ai-diary-assistant', {
           body: { action: 'mood', content }
         }),
         supabase.functions.invoke('ai-diary-assistant', {
-          body: { 
-            action: 'insights', 
-            content,
-            preferences,
-            recentEntries,
-            userGoals
-          }
+          body: { action: 'mirror', content }
         })
       ]);
 
       if (moodResponse.error) throw moodResponse.error;
-      if (insightsResponse.error) throw insightsResponse.error;
+      if (lensResponse.error) throw lensResponse.error;
 
       const detectedMood = moodResponse.data.result.trim().toLowerCase();
-      const insights = insightsResponse.data.result;
+      let lensInsights = {};
+      try {
+        lensInsights = lensResponse.data?.result ? JSON.parse(lensResponse.data.result) : {};
+      } catch (e) {
+        console.error('Failed to parse lens insights:', e);
+      }
 
       const totalMemories = entries.length + 1;
       setLastMemory({ count: totalMemories, mood: detectedMood });
@@ -178,7 +178,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
         const insightMessage: MirrorMessage = {
           id: Date.now().toString(),
           type: 'insight',
-          content: insights,
+          content: JSON.stringify(lensInsights),
           mood: detectedMood,
           timestamp: new Date().toISOString()
         };
@@ -190,7 +190,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
         title: null,
         content,
         mood: detectedMood,
-        ai_insights: insights,
+        lens_insights: lensInsights,
       });
 
       if (!subscribed) {
@@ -227,8 +227,7 @@ export const ChatJournal = ({ onEntryCreated }: ChatJournalProps) => {
           <div key={message.id}>
             {message.type === 'insight' ? (
               <MirrorInsight 
-                content={message.content}
-                mood={message.mood}
+                lensInsights={JSON.parse(message.content || '{}')}
                 timestamp={message.timestamp}
               />
             ) : null}
