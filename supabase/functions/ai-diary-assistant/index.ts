@@ -22,29 +22,31 @@ serve(async (req) => {
     let systemPrompt = '';
     let userPrompt = '';
 
-    if (action === 'mirror') {
-      // Mirror System: One-sentence insights using rhythm and reflection
-      systemPrompt = `You are the Mirror. Analyze this memory and return a JSON object:
+    if (action === 'analyze') {
+      // Analyze memory and return structured data
+      systemPrompt = `You are a memory analyzer. Analyze this memory and return a JSON object with:
 {
-  "love": { "detected": boolean, "signal": "one sentence about connection/relationships" },
-  "energy": { "detected": boolean, "signal": "one sentence about vitality/momentum" },
-  "work": { "detected": boolean, "signal": "one sentence about purpose/output" },
-  "growth": { "detected": boolean, "signal": "one sentence about insight/evolution" },
-  "satisfaction": { "detected": boolean, "signal": "one sentence about peace/contentment" }
+  "lens_scores": { "love": 0-1, "energy": 0-1, "work": 0-1, "growth": 0-1, "satisfaction": 0-1 },
+  "dominant_lens": "love|energy|work|growth|satisfaction",
+  "sentiment": -1 to 1,
+  "mood": "happiness|sadness|fear|anger|surprise|disgust",
+  "insights": [
+    {
+      "lens": "dominant_lens_name",
+      "signal": "brief factual observation (max 8 words)",
+      "interpretation": "[Trend + Category + Meaning] in one sentence (max 12 words)"
+    }
+  ]
 }
 
-Format: [Trend + Category + Meaning]
-Examples:
-- "Your Energy has been rising — you sound lighter this week."
-- "Love has gone quiet lately."
-- "Work is steady, but Satisfaction hasn't caught up."
+Lens definitions:
+- love: Connection, belonging, emotional warmth (people, affection, care)
+- energy: Vitality, rhythm, drive (rest, pace, momentum)
+- work: Purpose, creation, mastery (building, striving, finishing)
+- growth: Evolution, learning, awareness (realized, learned, changed)
+- satisfaction: Harmony, balance, contentment (peace, calm, closure)
 
-Rules:
-- Maximum 12 words per signal
-- Use present tense: "sounds," "shows," "feels"
-- Grounded in what they did, not what they should do
-- Poetic but factual
-- detected=true only if clearly present`;
+Generate 1-2 insights for lenses with scores > 0.3. Use present tense, poetic but factual.`;
       userPrompt = `Memory: "${content}"`;
     } else if (action === 'mood') {
       systemPrompt = 'Detect the primary emotion using Ekman\'s 6 core survival emotions. Respond with ONLY ONE WORD from: happiness, sadness, fear, anger, surprise, disgust. These are evolutionary emotions that serve survival functions.';
@@ -72,8 +74,8 @@ Rules:
       ],
     };
 
-    // Use JSON mode for mirror analysis to ensure structured output
-    if (action === 'mirror') {
+    // Use JSON mode for analyze action
+    if (action === 'analyze') {
       requestBody.response_format = { type: "json_object" };
     }
 

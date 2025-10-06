@@ -44,42 +44,6 @@ export type Database = {
         }
         Relationships: []
       }
-      diary_entries: {
-        Row: {
-          ai_insights: string | null
-          content: string
-          created_at: string
-          id: string
-          lens_insights: Json | null
-          mood: string | null
-          title: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          ai_insights?: string | null
-          content: string
-          created_at?: string
-          id?: string
-          lens_insights?: Json | null
-          mood?: string | null
-          title?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          ai_insights?: string | null
-          content?: string
-          created_at?: string
-          id?: string
-          lens_insights?: Json | null
-          mood?: string | null
-          title?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       entry_embeddings: {
         Row: {
           content: string
@@ -110,10 +74,96 @@ export type Database = {
             foreignKeyName: "entry_embeddings_entry_id_fkey"
             columns: ["entry_id"]
             isOneToOne: false
-            referencedRelation: "diary_entries"
+            referencedRelation: "memories"
             referencedColumns: ["id"]
           },
         ]
+      }
+      insights: {
+        Row: {
+          created_at: string | null
+          id: string
+          interpretation: string | null
+          lens: string
+          memory_id: string | null
+          reflection_prompt: string | null
+          signal: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interpretation?: string | null
+          lens: string
+          memory_id?: string | null
+          reflection_prompt?: string | null
+          signal?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interpretation?: string | null
+          lens?: string
+          memory_id?: string | null
+          reflection_prompt?: string | null
+          signal?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insights_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memories: {
+        Row: {
+          ai_insights: string | null
+          content: string
+          created_at: string
+          dominant_lens: string | null
+          id: string
+          lens_insights: Json | null
+          lens_scores: Json | null
+          mood: string | null
+          sentiment: number | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_insights?: string | null
+          content: string
+          created_at?: string
+          dominant_lens?: string | null
+          id?: string
+          lens_insights?: Json | null
+          lens_scores?: Json | null
+          mood?: string | null
+          sentiment?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_insights?: string | null
+          content?: string
+          created_at?: string
+          dominant_lens?: string | null
+          id?: string
+          lens_insights?: Json | null
+          lens_scores?: Json | null
+          mood?: string | null
+          sentiment?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -229,6 +279,7 @@ export type Database = {
           id: string
           last_updated: string | null
           recurring_patterns: Json | null
+          theme_preference: string | null
           themes: Json | null
           tone_preference: string | null
           user_id: string
@@ -239,6 +290,7 @@ export type Database = {
           id?: string
           last_updated?: string | null
           recurring_patterns?: Json | null
+          theme_preference?: string | null
           themes?: Json | null
           tone_preference?: string | null
           user_id: string
@@ -249,6 +301,7 @@ export type Database = {
           id?: string
           last_updated?: string | null
           recurring_patterns?: Json | null
+          theme_preference?: string | null
           themes?: Json | null
           tone_preference?: string | null
           user_id?: string

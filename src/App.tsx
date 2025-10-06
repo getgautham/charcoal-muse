@@ -3,9 +3,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { Mirror } from "./pages/Mirror";
+import { Lens } from "./pages/Lens";
+import { Compass } from "./pages/Compass";
+import { Archive } from "./pages/Archive";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import { MainLayout } from "./components/MainLayout";
 
 const queryClient = new QueryClient();
 
@@ -16,9 +20,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Mirror />} />
+            <Route path="/mirror" element={<Mirror />} />
+            <Route path="/lens" element={<Lens />} />
+            <Route path="/compass" element={<Compass />} />
+            <Route path="/archive" element={<Archive />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
