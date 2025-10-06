@@ -118,12 +118,14 @@ export const Stream = () => {
 
     const chart = root.container.children.push(
       am5xy.XYChart.new(root, {
-        panX: false,
+        panX: true,
         panY: false,
-        wheelX: "none",
+        wheelX: "panX",
         wheelY: "none",
+        pinchZoomX: true,
         paddingTop: 20,
-        paddingBottom: 20
+        paddingBottom: 20,
+        layout: root.verticalLayout
       })
     );
 
@@ -131,9 +133,9 @@ export const Stream = () => {
       am5xy.DateAxis.new(root, {
         baseInterval: { timeUnit: "day", count: 1 },
         renderer: am5xy.AxisRendererX.new(root, { 
-          visible: false,
-          minGridDistance: 50
-        })
+          minGridDistance: 30
+        }),
+        tooltip: am5.Tooltip.new(root, {})
       })
     );
 
@@ -273,7 +275,7 @@ export const Stream = () => {
           </div>
         </div>
       ) : (
-        <div ref={chartRef} className="w-full h-[50vh] rounded-lg bg-card/30 p-2 mb-8" />
+        <div ref={chartRef} className="w-full h-[50vh] min-h-[300px] rounded-lg bg-card/30 p-2 mb-8" />
       )}
 
       <div className="mt-8 space-y-3">

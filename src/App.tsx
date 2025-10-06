@@ -24,7 +24,6 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route element={<MainLayout />}>
             <Route path="/" element={<Mirror />} />
-            <Route path="/mirror" element={<Mirror />} />
             <Route path="/lens" element={<Lens />} />
             <Route path="/compass" element={<Compass />} />
             <Route path="/archive" element={<Archive />} />

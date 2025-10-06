@@ -91,6 +91,18 @@ export const Compass = () => {
 
         setCompassData({ averages, deltas });
 
+        // Check cache first (5 min expiry)
+        const cacheKey = `compass_direction_${user.id}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < 5 * 60 * 1000) {
+            setDirection(data);
+            setLoading(false);
+            return;
+          }
+        }
+
         // Generate AI direction
         try {
           const { data: directionData, error: directionError } = await supabase.functions.invoke('compass-direction', {
@@ -103,6 +115,7 @@ export const Compass = () => {
 
           if (!directionError && directionData) {
             setDirection(directionData);
+            localStorage.setItem(cacheKey, JSON.stringify({ data: directionData, timestamp: Date.now() }));
           }
         } catch (err) {
           console.error('Error generating direction:', err);

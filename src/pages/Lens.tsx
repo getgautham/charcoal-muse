@@ -82,6 +82,18 @@ export const Lens = () => {
 
         setAnalytics(lensData);
 
+        // Check cache first (5 min expiry)
+        const cacheKey = `lens_insight_${user.id}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < 5 * 60 * 1000) {
+            setAiInsight(data);
+            setLoading(false);
+            return;
+          }
+        }
+
         // Generate AI insight
         try {
           const { data: insightData, error: insightError } = await supabase.functions.invoke('lens-insight', {
@@ -90,6 +102,7 @@ export const Lens = () => {
 
           if (!insightError && insightData) {
             setAiInsight(insightData);
+            localStorage.setItem(cacheKey, JSON.stringify({ data: insightData, timestamp: Date.now() }));
           }
         } catch (err) {
           console.error('Error generating AI insight:', err);
