@@ -8,77 +8,79 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 15%;
+    /* Brutalist Design System - Neo-brutalism */
+    --background: 48 100% 96%;
+    --foreground: 0 0% 0%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 15%;
+    --card: 48 100% 93%;
+    --card-foreground: 0 0% 0%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 15%;
+    --popover: 48 100% 93%;
+    --popover-foreground: 0 0% 0%;
 
-    --primary: 25 95% 53%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 195 100% 75%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 0 0% 45%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 48 100% 93%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 0 0% 96%;
+    --muted: 48 100% 88%;
     --muted-foreground: 0 0% 40%;
 
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 195 100% 75%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 0 0% 0%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 25 95% 53%;
+    --border: 0 0% 0%;
+    --input: 48 100% 93%;
+    --ring: 0 0% 0%;
 
-    --radius: 0.75rem;
+    --radius: 0.3125rem;
     
-    --shadow-card: 0 1px 3px hsla(0, 0%, 0%, 0.12);
+    --shadow-brutal: 4px 4px 0px hsl(0, 0%, 0%);
+    --shadow-brutal-sm: 2px 2px 0px hsl(0, 0%, 0%);
     
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-brutal: all 0.15s ease;
 
     /* Ekman's 6 Core Emotions - Color System */
-    --emotion-happiness: 48 96% 53%;
-    --emotion-sadness: 221 83% 53%;
-    --emotion-fear: 280 60% 50%;
-    --emotion-anger: 0 72% 51%;
-    --emotion-surprise: 168 76% 42%;
-    --emotion-disgust: 88 50% 53%;
+    --emotion-happiness: 48 96% 70%;
+    --emotion-sadness: 221 70% 65%;
+    --emotion-fear: 280 60% 70%;
+    --emotion-anger: 0 72% 65%;
+    --emotion-surprise: 168 70% 65%;
+    --emotion-disgust: 88 50% 65%;
   }
 
   .dark {
-    --background: 240 18% 10%;
-    --foreground: 240 10% 90%;
+    --background: 0 0% 10%;
+    --foreground: 48 100% 96%;
 
-    --card: 240 15% 14%;
-    --card-foreground: 240 10% 90%;
+    --card: 0 0% 15%;
+    --card-foreground: 48 100% 96%;
 
-    --popover: 240 16% 12%;
-    --popover-foreground: 240 10% 90%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 48 100% 96%;
 
-    --primary: 200 28% 58%;
-    --primary-foreground: 240 18% 10%;
+    --primary: 195 100% 65%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 280 22% 52%;
-    --secondary-foreground: 240 10% 90%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 48 100% 96%;
 
-    --muted: 240 12% 20%;
-    --muted-foreground: 240 8% 65%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 48 50% 70%;
 
-    --accent: 320 28% 58%;
-    --accent-foreground: 240 10% 90%;
+    --accent: 195 100% 65%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 45% 58%;
-    --destructive-foreground: 240 10% 90%;
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 48 100% 96%;
 
-    --border: 240 12% 22%;
-    --input: 240 14% 18%;
-    --ring: 200 28% 58%;
+    --border: 48 100% 96%;
+    --input: 0 0% 15%;
+    --ring: 48 100% 96%;
   }
 }
 
@@ -88,11 +90,30 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
   /* Mobile safe area support */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Brutalist button styles */
+  .btn-brutal {
+    @apply border-2 border-border shadow-[4px_4px_0px_hsl(var(--border))] transition-all;
+  }
+
+  .btn-brutal:active {
+    @apply shadow-none translate-x-[3px] translate-y-[3px];
+  }
+
+  /* Brutalist card styles */
+  .card-brutal {
+    @apply border-2 border-border shadow-[4px_4px_0px_hsl(var(--border))];
+  }
+
+  /* Brutalist input styles */
+  .input-brutal {
+    @apply border-2 border-border shadow-[4px_4px_0px_hsl(var(--border))] focus:shadow-[4px_4px_0px_hsl(var(--ring))];
   }
 }

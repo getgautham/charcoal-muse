@@ -38,7 +38,7 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border/50 pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t-2 border-border pb-safe">
       <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Left: Presets Button */}
@@ -47,9 +47,9 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-8 w-8 rounded-full bg-primary/10 hover:bg-primary/20"
+                className="h-8 w-8 btn-brutal bg-primary hover:bg-primary/90"
               >
-                <Star className="w-4 h-4 text-primary" />
+                <Star className="w-4 h-4 text-primary-foreground" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[280px]">
@@ -72,13 +72,13 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
 
           {/* Center: Tabs */}
           <div className="flex-1 flex justify-center">
-            <div className="inline-flex bg-muted/50 rounded-full p-1">
+            <div className="inline-flex card-brutal bg-muted p-1 rounded-md">
               <button
                 onClick={() => onTabChange('chat')}
-                className={`px-6 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-6 py-1.5 rounded text-sm font-bold transition-all ${
                   activeTab === 'chat'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-foreground hover:bg-muted'
                 }`}
               >
                 <MessageCircle className="w-4 h-4 inline mr-1.5" />
@@ -86,10 +86,10 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
               </button>
               <button
                 onClick={() => onTabChange('goals')}
-                className={`px-6 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-6 py-1.5 rounded text-sm font-bold transition-all ${
                   activeTab === 'goals'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-foreground hover:bg-muted'
                 }`}
               >
                 <Target className="w-4 h-4 inline mr-1.5" />
@@ -97,10 +97,10 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
               </button>
               <button
                 onClick={() => onTabChange('story')}
-                className={`px-6 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-6 py-1.5 rounded text-sm font-bold transition-all ${
                   activeTab === 'story'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-foreground hover:bg-muted'
                 }`}
               >
                 <TrendingUp className="w-4 h-4 inline mr-1.5" />
@@ -114,9 +114,9 @@ export const TopNav = ({ activeTab, onTabChange, onDiceClick, onPresetsClick }: 
             size="icon"
             variant="ghost"
             onClick={onDiceClick}
-            className="h-8 w-8 rounded-full bg-accent/10 hover:bg-accent/20"
+            className="h-8 w-8 btn-brutal bg-accent hover:bg-accent/90"
           >
-            <RefreshCw className="w-4 h-4 text-accent" />
+            <RefreshCw className="w-4 h-4 text-accent-foreground" />
           </Button>
         </div>
       </div>
