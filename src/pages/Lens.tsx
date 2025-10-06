@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LENSES, LensType } from "@/types/lens";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Loader2, Eye } from "lucide-react";
 
 interface LensInsight {
   lens: string;
@@ -50,17 +50,37 @@ export const Lens = () => {
     }
   };
 
+  const hasAnyInsights = Object.keys(insights).length > 0;
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading lenses...</p>
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Loading lenses...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-6 pb-24">
-      <h1 className="text-2xl font-bold mb-6">Five Lenses</h1>
+    <div className="h-full overflow-y-auto px-6 py-6 pb-24">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">Five Lenses</h1>
+        <p className="text-sm text-muted-foreground">
+          View patterns in your memories through five dimensions
+        </p>
+      </div>
+      
+      {!hasAnyInsights && (
+        <div className="flex flex-col items-center justify-center py-12 gap-4">
+          <Eye className="w-16 h-16 text-muted-foreground/20" />
+          <div className="text-center space-y-2 max-w-xs">
+            <p className="text-lg font-semibold text-foreground">No insights yet</p>
+            <p className="text-sm text-muted-foreground/60">
+              Keep capturing memories to unlock lens insights
+            </p>
+          </div>
+        </div>
+      )}
       
       <div className="space-y-4">
         {LENSES.map((lens) => (

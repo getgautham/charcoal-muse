@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LENSES } from "@/types/lens";
 import { Memory, LensScores } from "@/hooks/useEntries";
-import { Compass as CompassIcon } from "lucide-react";
+import { Compass as CompassIcon, Loader2 } from "lucide-react";
 
 export const Compass = () => {
   const [summary, setSummary] = useState<Record<string, string>>({});
@@ -60,17 +60,19 @@ export const Compass = () => {
   };
 
   const summaryText = LENSES.map(lens => `${lens.label} ${summary[lens.id] || 'steady'}`).join(' • ');
+  const hasData = Object.keys(summary).length > 0;
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading compass...</p>
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Loading compass...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col items-center justify-center px-4 pb-24">
+    <div className="h-full flex flex-col items-center justify-center px-6 pb-24">
       <div className="mb-8">
         <CompassIcon 
           className="w-24 h-24 text-primary"
@@ -78,28 +80,40 @@ export const Compass = () => {
         />
       </div>
 
-      <h1 className="text-2xl font-bold mb-4 text-center">Your Life Compass</h1>
+      <h1 className="text-2xl font-bold mb-2 text-center">Your Life Compass</h1>
+      <p className="text-sm text-muted-foreground mb-6 text-center max-w-sm">
+        See your direction: what's rising, what's fading
+      </p>
       
-      <div className="card-brutal p-6 max-w-md">
-        <p className="text-sm text-foreground leading-relaxed">
-          {summaryText}
-        </p>
-      </div>
-
-      <div className="mt-8 space-y-2 max-w-md">
-        {LENSES.map((lens) => (
-          <div key={lens.id} className="flex items-center gap-3">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: lens.color }}
-            />
-            <span className="text-sm font-medium text-foreground">{lens.label}</span>
-            <span className="text-sm text-muted-foreground ml-auto capitalize">
-              {summary[lens.id] || 'steady'}
-            </span>
+      {hasData ? (
+        <>
+          <div className="card-brutal p-6 max-w-md mb-8">
+            <p className="text-sm text-foreground leading-relaxed text-center">
+              {summaryText}
+            </p>
           </div>
-        ))}
-      </div>
+
+          <div className="space-y-3 max-w-md w-full">
+            {LENSES.map((lens) => (
+              <div key={lens.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: lens.color }}
+                />
+                <span className="text-sm font-medium text-foreground">{lens.label}</span>
+                <span className="text-sm text-muted-foreground ml-auto capitalize font-semibold">
+                  {summary[lens.id] || 'steady'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="text-center text-muted-foreground/60 max-w-xs">
+          <p className="text-sm">Not enough data yet to show your compass</p>
+          <p className="text-xs mt-2">Keep capturing memories to see your direction</p>
+        </div>
+      )}
     </div>
   );
 };

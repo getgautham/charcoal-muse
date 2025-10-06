@@ -1,11 +1,32 @@
+import { useEffect } from "react";
 import { useEntries, Memory } from "@/hooks/useEntries";
 import { LENS_CONFIG } from "@/types/lens";
 import { format } from "date-fns";
 import { useState } from "react";
+import { Loader2, Archive as ArchiveIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Archive = () => {
-  const { entries, loading } = useEntries();
+  const { entries, loading, refresh } = useEntries();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Realtime updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('archive-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'memories'
+      }, () => {
+        refresh();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refresh]);
 
   const groupedByDate = entries.reduce((acc, memory) => {
     const date = format(new Date(memory.created_at), 'MMMM yyyy');
@@ -16,22 +37,29 @@ export const Archive = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading archive...</p>
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Loading archive...</p>
       </div>
     );
   }
 
   if (entries.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">No memories yet</p>
+      <div className="flex flex-col items-center justify-center h-full gap-4 px-6">
+        <ArchiveIcon className="w-16 h-16 text-muted-foreground/20" />
+        <div className="text-center space-y-2">
+          <p className="text-lg font-semibold text-foreground">No memories yet</p>
+          <p className="text-sm text-muted-foreground/60">
+            Start capturing moments in Mirror to build your archive
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-6 pb-24">
+    <div className="h-full overflow-y-auto px-6 py-6 pb-24">
       <h1 className="text-2xl font-bold mb-6">Archive</h1>
 
       <div className="space-y-6">

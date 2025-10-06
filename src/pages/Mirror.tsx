@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useEntries } from "@/hooks/useEntries";
-import { Crown } from "lucide-react";
+import { Crown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LensScores } from "@/types/lens";
 
@@ -137,7 +137,20 @@ export const Mirror = () => {
         show={showFeedback}
       />
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-4">
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+        {loading && (
+          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm">Capturing memory...</span>
+          </div>
+        )}
+        
+        {!loading && !currentInsight && (
+          <div className="text-center text-muted-foreground/40 py-12">
+            <p className="text-sm">Your reflections will appear here</p>
+          </div>
+        )}
+        
         {currentInsight && (
           <MirrorInsight 
             lensInsights={{ [currentInsight.lens]: { detected: true, signal: currentInsight.signal } }}
@@ -146,7 +159,7 @@ export const Mirror = () => {
         )}
       </div>
 
-      <div className="bg-background px-4 py-3 pb-24">
+      <div className="bg-background px-6 py-4 pb-24 border-t border-border">
         {!subscribed && prompts_remaining !== undefined && prompts_remaining <= 5 && (
           <div className="mb-3 card-brutal bg-destructive/10 p-3 flex items-center justify-between">
             <p className="text-xs font-bold text-foreground">

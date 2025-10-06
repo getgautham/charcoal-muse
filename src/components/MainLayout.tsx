@@ -28,7 +28,14 @@ export const MainLayout = () => {
     <div className="min-h-screen bg-background">
       <WelcomeDialog />
       
-      <div className="h-screen overflow-hidden pb-16 max-w-6xl mx-auto">
+      {/* Branding Header */}
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-foreground">Dreamlink</h1>
+        </div>
+      </header>
+      
+      <div className="h-[calc(100vh-72px)] overflow-hidden pb-16 max-w-6xl mx-auto">
         <Outlet />
       </div>
       

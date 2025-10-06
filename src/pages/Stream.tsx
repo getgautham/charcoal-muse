@@ -5,6 +5,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { Memory, LensScores } from "@/hooks/useEntries";
 import { LENSES } from "@/types/lens";
+import { Loader2, Waves } from "lucide-react";
 
 interface StreamData {
   date: string;
@@ -179,36 +180,54 @@ export const Stream = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading stream...</p>
+      <div className="flex flex-col items-center justify-center h-full gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Loading stream...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-6 pb-24">
-      <h1 className="text-2xl font-bold mb-2">Stream</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Every line is a force within you. Watch them find balance.
-      </p>
+    <div className="h-full overflow-y-auto px-6 py-6 pb-24">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">Stream</h1>
+        <p className="text-sm text-muted-foreground">
+          Every line is a force within you. Watch them find balance.
+        </p>
+      </div>
 
       {weeklySummary && (
-        <div className="card-brutal p-4 mb-6 bg-muted/50">
+        <div className="card-brutal p-4 mb-6 bg-muted/30">
           <p className="text-sm text-foreground">💬 {weeklySummary}</p>
         </div>
       )}
 
-      <div ref={chartRef} className="w-full h-[60vh] rounded-lg" />
+      <div ref={chartRef} className="w-full h-[50vh] rounded-lg bg-card/30 p-2" />
 
-      <div className="mt-6 space-y-2">
+      {!weeklySummary && (
+        <div className="flex flex-col items-center justify-center py-16 gap-4">
+          <Waves className="w-16 h-16 text-muted-foreground/20" />
+          <div className="text-center space-y-2 max-w-xs">
+            <p className="text-lg font-semibold text-foreground">No stream data yet</p>
+            <p className="text-sm text-muted-foreground/60">
+              Your emotional currents will flow here as you capture more memories
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-8 space-y-3">
+        <h3 className="text-sm font-bold text-muted-foreground mb-3">Legend</h3>
         {LENSES.map((lens) => (
-          <div key={lens.id} className="flex items-center gap-3">
+          <div key={lens.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20">
             <div
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: lens.color }}
             />
-            <span className="text-sm font-medium text-foreground">{lens.label}</span>
-            <span className="text-xs text-muted-foreground ml-auto">{lens.essence}</span>
+            <div className="flex-1">
+              <span className="text-sm font-medium text-foreground">{lens.label}</span>
+              <span className="text-xs text-muted-foreground block">{lens.essence}</span>
+            </div>
           </div>
         ))}
       </div>
