@@ -53,14 +53,14 @@ export const Mirror = () => {
 
       const { lens_scores, dominant_lens, sentiment, mood, insights } = analysisData.result;
 
-      // Save memory - RLS will set user_id automatically
-      const { error: memoryError } = await supabase.from('memories').insert({
+      // Save memory - RLS will set user_id automatically via default
+      const { error: memoryError } = await supabase.from('memories').insert([{
         content,
-        lens_scores: lens_scores,
+        lens_scores,
         dominant_lens,
         sentiment,
         mood
-      });
+      }]);
 
       if (memoryError) throw memoryError;
 

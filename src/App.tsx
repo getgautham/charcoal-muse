@@ -7,6 +7,7 @@ import { Mirror } from "./pages/Mirror";
 import { Lens } from "./pages/Lens";
 import { Compass } from "./pages/Compass";
 import { Archive } from "./pages/Archive";
+import { Stream } from "./pages/Stream";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { MainLayout } from "./components/MainLayout";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/lens" element={<Lens />} />
             <Route path="/compass" element={<Compass />} />
             <Route path="/archive" element={<Archive />} />
+            <Route path="/stream" element={<Stream />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

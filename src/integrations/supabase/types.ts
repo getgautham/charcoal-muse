@@ -147,7 +147,7 @@ export type Database = {
           sentiment?: number | null
           title?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           ai_insights?: string | null
