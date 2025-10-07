@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import * as am5 from "@amcharts/amcharts5";
-import * as am5xy from "@amcharts/amcharts5/xy";
-import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import { createChart, ColorType, LineStyle, LineSeries } from "lightweight-charts";
 import { Memory, LensScores } from "@/hooks/useEntries";
 import { LENSES } from "@/types/lens";
 import { Loader2 } from "lucide-react";
@@ -14,7 +12,7 @@ interface StreamData {
 
 export const Stream = () => {
   const chartRef = useRef<HTMLDivElement>(null);
-  const rootRef = useRef<am5.Root | null>(null);
+  const chartInstanceRef = useRef<any>(null);
   const [loading, setLoading] = useState(true);
   const [memoryCount, setMemoryCount] = useState(0);
   const [weeklySummary, setWeeklySummary] = useState<string>("");
@@ -23,8 +21,8 @@ export const Stream = () => {
     loadStreamData();
     
     return () => {
-      if (rootRef.current) {
-        rootRef.current.dispose();
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.remove();
       }
     };
   }, []);
@@ -50,7 +48,7 @@ export const Stream = () => {
           lens_scores: (m.lens_scores || {}) as any as LensScores
         })) as Memory[];
         const streamData = processMemoriesForChart(memories);
-        createChart(streamData);
+        initializeChart(streamData);
         generateWeeklySummary(memories);
       }
     } catch (error) {
@@ -104,82 +102,79 @@ export const Stream = () => {
     setWeeklySummary(trends.join(' • '));
   };
 
-  const createChart = (data: StreamData[]) => {
+  const initializeChart = (data: StreamData[]) => {
     if (!chartRef.current) return;
 
-    if (rootRef.current) {
-      rootRef.current.dispose();
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.remove();
     }
 
-    const root = am5.Root.new(chartRef.current);
-    rootRef.current = root;
-
-    root.setThemes([am5themes_Animated.new(root)]);
-
-    const chart = root.container.children.push(
-      am5xy.XYChart.new(root, {
-        panX: true,
-        panY: false,
-        wheelX: "panX",
-        wheelY: "none",
-        pinchZoomX: true,
-        paddingTop: 20,
-        paddingBottom: 20,
-        layout: root.verticalLayout
-      })
-    );
-
-    const xAxis = chart.xAxes.push(
-      am5xy.DateAxis.new(root, {
-        baseInterval: { timeUnit: "day", count: 1 },
-        renderer: am5xy.AxisRendererX.new(root, { 
-          minGridDistance: 30
-        }),
-        tooltip: am5.Tooltip.new(root, {})
-      })
-    );
-
-    const yAxis = chart.yAxes.push(
-      am5xy.ValueAxis.new(root, {
-        min: 0,
-        max: 1,
-        strictMinMax: true,
-        renderer: am5xy.AxisRendererY.new(root, { visible: false })
-      })
-    );
-
-    LENSES.forEach((lens) => {
-      const series = chart.series.push(
-        am5xy.SmoothedXLineSeries.new(root, {
-          name: lens.label,
-          xAxis: xAxis,
-          yAxis: yAxis,
-          valueYField: lens.id,
-          valueXField: "date",
-          stroke: am5.color(lens.color),
-          tension: 0.8,
-          tooltip: am5.Tooltip.new(root, {
-            labelText: `${lens.label}: {valueY.formatNumber('#.0%')}`,
-            getFillFromSprite: false
-          })
-        })
-      );
-
-      series.strokes.template.setAll({
-        strokeWidth: 2.5,
-        strokeOpacity: 0.85
-      });
-
-      const processedData = data.map(d => ({
-        date: new Date(d.date).getTime(),
-        [lens.id]: d[lens.id] || 0
-      }));
-
-      series.data.setAll(processedData);
-      series.appear(1000);
+    const chart = createChart(chartRef.current, {
+      layout: {
+        background: { type: ColorType.Solid, color: 'transparent' },
+        textColor: 'rgba(255, 255, 255, 0.7)',
+      },
+      width: chartRef.current.clientWidth,
+      height: 400,
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
+      rightPriceScale: {
+        visible: false,
+      },
+      leftPriceScale: {
+        visible: false,
+      },
+      grid: {
+        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
+      },
+      crosshair: {
+        mode: 1,
+        vertLine: {
+          color: 'rgba(255, 255, 255, 0.2)',
+          width: 1,
+          style: LineStyle.Dashed,
+        },
+        horzLine: {
+          color: 'rgba(255, 255, 255, 0.2)',
+          width: 1,
+          style: LineStyle.Dashed,
+        },
+      },
     });
 
-    chart.appear(1000, 100);
+    chartInstanceRef.current = chart;
+
+    LENSES.forEach((lens) => {
+      const lineSeries = chart.addSeries(LineSeries, {
+        color: lens.color,
+        lineWidth: 2,
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+
+      const seriesData = data.map(d => ({
+        time: (new Date(d.date).getTime() / 1000) as any,
+        value: (d[lens.id] as number) || 0
+      })).sort((a, b) => a.time - b.time);
+
+      lineSeries.setData(seriesData);
+    });
+
+    chart.timeScale().fitContent();
+
+    const handleResize = () => {
+      if (chartRef.current && chartInstanceRef.current) {
+        chartInstanceRef.current.applyOptions({ 
+          width: chartRef.current.clientWidth 
+        });
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   };
 
   const getEmptyStateMessage = () => {
