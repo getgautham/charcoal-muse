@@ -1,9 +1,20 @@
+/**
+ * Stream Component - Powered by TradingView Lightweight Charts
+ * 
+ * This component visualizes user memory data over time using TradingView's
+ * Lightweight Charts library (https://tradingview.github.io/lightweight-charts/)
+ * Licensed under Apache License 2.0
+ * 
+ * Attribution: Charts powered by TradingView Lightweight Charts
+ */
+
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { createChart, ColorType, LineStyle, LineSeries } from "lightweight-charts";
+import { createChart, ColorType, LineStyle, ISeriesApi } from "lightweight-charts";
 import { Memory, LensScores } from "@/hooks/useEntries";
 import { LENSES } from "@/types/lens";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface StreamData {
   date: string;
@@ -13,9 +24,13 @@ interface StreamData {
 export const Stream = () => {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<any>(null);
+  const seriesRef = useRef<Map<string, ISeriesApi<"Line">>>(new Map());
   const [loading, setLoading] = useState(true);
   const [memoryCount, setMemoryCount] = useState(0);
   const [weeklySummary, setWeeklySummary] = useState<string>("");
+  const [activeLenses, setActiveLenses] = useState<Set<string>>(
+    new Set(LENSES.map(l => l.id))
+  );
 
   useEffect(() => {
     loadStreamData();
@@ -121,7 +136,12 @@ export const Stream = () => {
         secondsVisible: false,
       },
       rightPriceScale: {
-        visible: false,
+        visible: true,
+        borderVisible: false,
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0.1,
+        },
       },
       leftPriceScale: {
         visible: false,
@@ -143,17 +163,20 @@ export const Stream = () => {
           style: LineStyle.Dashed,
         },
       },
-    });
+    } as any);
 
     chartInstanceRef.current = chart;
+    seriesRef.current.clear();
 
     LENSES.forEach((lens) => {
-      const lineSeries = chart.addSeries(LineSeries, {
+      const lineSeries = chart.addSeries({
+        type: 'Line',
         color: lens.color,
         lineWidth: 2,
         priceLineVisible: false,
-        lastValueVisible: false,
-      });
+        lastValueVisible: true,
+        title: lens.label,
+      } as any);
 
       const seriesData = data.map(d => ({
         time: (new Date(d.date).getTime() / 1000) as any,
@@ -161,6 +184,7 @@ export const Stream = () => {
       })).sort((a, b) => a.time - b.time);
 
       lineSeries.setData(seriesData);
+      seriesRef.current.set(lens.id, lineSeries as any);
     });
 
     chart.timeScale().fitContent();
@@ -175,6 +199,26 @@ export const Stream = () => {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  };
+
+  const toggleLens = (lensId: string) => {
+    setActiveLenses(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(lensId)) {
+        newSet.delete(lensId);
+      } else {
+        newSet.add(lensId);
+      }
+      return newSet;
+    });
+
+    const series = seriesRef.current.get(lensId);
+    if (series && chartInstanceRef.current) {
+      const isVisible = activeLenses.has(lensId);
+      series.applyOptions({
+        visible: !isVisible,
+      });
+    }
   };
 
   const getEmptyStateMessage = () => {
@@ -270,7 +314,27 @@ export const Stream = () => {
           </div>
         </div>
       ) : (
-        <div ref={chartRef} className="w-full h-[50vh] min-h-[300px] rounded-lg bg-card/30 p-2 mb-8" />
+        <>
+          <div ref={chartRef} className="w-full h-[50vh] min-h-[300px] rounded-lg bg-card/30 p-2 mb-4" />
+          
+          <div className="flex flex-wrap gap-2 mb-6">
+            {LENSES.map((lens) => (
+              <Button
+                key={lens.id}
+                variant={activeLenses.has(lens.id) ? "default" : "outline"}
+                size="sm"
+                onClick={() => toggleLens(lens.id)}
+                className="flex items-center gap-2"
+              >
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: lens.color }}
+                />
+                {lens.label}
+              </Button>
+            ))}
+          </div>
+        </>
       )}
 
       <div className="mt-8 space-y-3">
